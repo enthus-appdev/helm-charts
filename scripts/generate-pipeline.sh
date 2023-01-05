@@ -20,30 +20,21 @@ do
   extends: .lint
   variables:
     HELM_NAME: "${f##*/}"
-  rules:
-    - if: '\$CI_COMMIT_TAG =~ "/^$/"'
-      changes:
-        - ${f}/**/*
+
 
 '${f##*/}:dev_push':
   stage: release
   extends: .dev_push
   variables:
     HELM_NAME: "${f##*/}"
-  rules:
-    - if: '\$CI_COMMIT_TAG =~ "/^$/"'
-      changes:
-        - ${f}/**/*
+
 
 '${f##*/}:release':
   stage: release
   extends: .release
   variables:
     HELM_NAME: "${f##*/}"
-  rules:
-    - if: '\$CI_COMMIT_TAG =~ "/^$/"'
-      changes:
-        - ${f}/Chart.yaml
+
 
 '${f##*/}:release_tag':
   stage: release
@@ -54,11 +45,7 @@ do
     HELM_NAME: "${f##*/}"
     CHART_RELEASE: "${CHART_RELEASE}"
     CHART_VERSION: "${CHART_VERSION}"
-  rules:
-    - if: '\$CI_COMMIT_TAG =~ "/^$/"'
-      changes:
-        - ${f}/Chart.yaml
-      allow_failure: true
+
 
 EOF
 
