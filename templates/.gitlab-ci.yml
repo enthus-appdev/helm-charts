@@ -12,7 +12,7 @@ default:
   script:
     - apk add --no-cache git
     - helm plugin install https://github.com/chartmuseum/helm-push
-    - helm repo add --username=gitlab-ci-token --password=$CI_JOB_TOKEN $CI_PROJECT_NAME $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/helm/stable
+    - helm repo add --username=gitlab-ci-token --password=$CI_JOB_TOKEN $CI_PROJECT_NAME $CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/helm/experimental
     - helm package .
     - helm cm-push . $CI_PROJECT_NAME --version=0.0.0-dev
 
@@ -24,17 +24,17 @@ default:
     - helm package .
     - helm cm-push . $CI_PROJECT_NAME
 
-.release_tag:
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  before_script:
-    - cd charts/${HELM_NAME}
-  script:
-    - echo "Running the release job."
-  release:
-    name: 'Release $CHART_RELEASE'
-    description: 'Created using the release-ci'
-    tag_name: '$CHART_RELEASE'
-    assets:
-      links:
-        - name: "$CHART_RELEASE"
-          url: https://{DOCKER_REGISTRY}/harbor/projects/{PROJECT_NUM}/helm-charts/${HELM_NAME}/versions/$CHART_VERSION
+#.release_tag:
+#  image: registry.gitlab.com/gitlab-org/release-cli:latest
+#  before_script:
+#    - cd charts/${HELM_NAME}
+#  script:
+#    - echo "Running the release job."
+#  release:
+#    name: 'Release $CHART_RELEASE'
+#    description: 'Created using the release-ci'
+#    tag_name: '$CHART_RELEASE'
+#    assets:
+#      links:
+#        - name: "$CHART_RELEASE"
+#          url: https://{DOCKER_REGISTRY}/harbor/projects/{PROJECT_NUM}/helm-charts/${HELM_NAME}/versions/$CHART_VERSION
