@@ -16,3 +16,4 @@ helm repo add --username <username> --password <access_token> enthus-experimenta
 ## Charts
 
 - [api-deployment](charts/api-deployment): Deployment Chart for API
+- [default](charts/default): Default Chart created by `helm create`
