@@ -10,19 +10,19 @@ default:
 
 .dev_push:
   script:
-    - apk add git
+    - apk add --no-cache git
     - helm plugin install https://github.com/chartmuseum/helm-push
-    - helm repo add --username=${DOCKER_REGISTRY_USER} --password=$(cat "$DOCKER_REGISTRY_PASSWORD") ${HELM_PROJECT} https://${DOCKER_REGISTRY}/chartrepo/${HELM_PROJECT}
+    - helm repo add --username=gitlab-ci-token --password=$CI_JOB_TOKEN $CI_PROJECT_NAME https://$CI_API_V4_URL/projects/$CI_PROJECT_ID/helm/api/stable/charts
     - helm package .
-    - helm cm-push . ${HELM_PROJECT} --version=0.0.0-dev
+    - helm cm-push . $CI_PROJECT_NAME --version=0.0.0-dev
 
 .release:
   script:
-    - apk add git
+    - apk add --no-cache git
     - helm plugin install https://github.com/chartmuseum/helm-push
-    - helm repo add --username=${DOCKER_REGISTRY_USER} --password=$(cat "$DOCKER_REGISTRY_PASSWORD") ${HELM_PROJECT} https://${DOCKER_REGISTRY}/chartrepo/${HELM_PROJECT}
+    - helm repo add --username=gitlab-ci-token --password=$CI_JOB_TOKEN $CI_PROJECT_NAME https://$CI_API_V4_URL/projects/$CI_PROJECT_ID/helm/api/stable/charts
     - helm package .
-    - helm cm-push . ${HELM_PROJECT}
+    - helm cm-push . $CI_PROJECT_NAME
 
 .release_tag:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
