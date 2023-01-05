@@ -1,9 +1,5 @@
 image: dtzar/helm-kubectl:3.5.3 #last version using k8s 1.20
 
-default:
-  before_script:
-    - cd charts/${HELM_NAME}
-
 .lint:
   script:
     - helm lint .
