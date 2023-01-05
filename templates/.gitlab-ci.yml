@@ -1,0 +1,36 @@
+image: dtzar/helm-kubectl:3.5.3 #last version using k8s 1.20
+
+.lint:
+  script:
+    - helm lint .
+
+.dev_push:
+  script:
+    - apk add git
+    - helm plugin install https://github.com/chartmuseum/helm-push
+    - helm repo add --username=${DOCKER_REGISTRY_USER} --password=$(cat "$DOCKER_REGISTRY_PASSWORD") ${HELM_PROJECT} https://${DOCKER_REGISTRY}/chartrepo/${HELM_PROJECT}
+    - helm package .
+    - helm cm-push . ${HELM_PROJECT} --version=0.0.0-dev
+
+.release:
+  script:
+    - apk add git
+    - helm plugin install https://github.com/chartmuseum/helm-push
+    - helm repo add --username=${DOCKER_REGISTRY_USER} --password=$(cat "$DOCKER_REGISTRY_PASSWORD") ${HELM_PROJECT} https://${DOCKER_REGISTRY}/chartrepo/${HELM_PROJECT}
+    - helm package .
+    - helm cm-push . ${HELM_PROJECT}
+
+.release_tag:
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  before_script:
+    - cd charts/${HELM_NAME}
+  script:
+    - echo "Running the release job."
+  release:
+    name: 'Release $CHART_RELEASE'
+    description: 'Created using the release-ci'
+    tag_name: '$CHART_RELEASE'
+    assets:
+      links:
+        - name: "$CHART_RELEASE"
+          url: https://{DOCKER_REGISTRY}/harbor/projects/{PROJECT_NUM}/helm-charts/${HELM_NAME}/versions/$CHART_VERSION

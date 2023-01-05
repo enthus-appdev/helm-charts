@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api-deployment.fullname" . }}
+  labels:
+    {{- include "api-deployment.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  strategy:
+    type: {{ .Values.podStrategyType }}
+  selector:
+    matchLabels:
+      {{- include "api-deployment.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api-deployment.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "api-deployment.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.args }}
+          args:
+          {{- range . }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/run/secret/cloud.google.com/service-account.json
+          {{- if ne .Values.gcp.projectID "" }}
+            - name: GOOGLE_CLOUD_PROJECT
+              value: {{ .Values.gcp.projectID | quote }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          {{- with .Values.config }}
+            - name: config
+              mountPath: /etc/nx
+              readOnly: true
+          {{- end }}
+            - name: gcp-service-account
+              mountPath: /var/run/secret/cloud.google.com
+              readOnly: true
+            - name: files
+              mountPath: /mnt/files
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- with .Values.config }}
+        - name: config
+          configMap:
+            name: {{ include "api-deployment.fullname" $ }}
+        {{- end }}
+        - name: gcp-service-account
+          secret:
+            secretName: {{ .Values.gcp.serviceAccount }}
+        - name: files
+        {{- with .Values.volume.data.volumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ . }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
