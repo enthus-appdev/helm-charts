@@ -5,6 +5,7 @@ chart-generator:
   stage: generate
   image: alpine:3.15
   script:
+    - apk add --no-cache bash
     - ./scripts/generate-pipeline.sh > generated-pipeline.yml
   artifacts:
     expire_in: 1 hour
