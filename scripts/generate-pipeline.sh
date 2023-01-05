@@ -36,15 +36,15 @@ do
     HELM_NAME: "${f##*/}"
 
 
-'${f##*/}:release_tag':
-  stage: release
-  extends: .release_tag
-  needs:
-    - '${f##*/}:release'
-  variables:
-    HELM_NAME: "${f##*/}"
-    CHART_RELEASE: "${CHART_RELEASE}"
-    CHART_VERSION: "${CHART_VERSION}"
+#'${f##*/}:release_tag':
+#  stage: release
+#  extends: .release_tag
+#  needs:
+#    - '${f##*/}:release'
+#  variables:
+#    HELM_NAME: "${f##*/}"
+#    CHART_RELEASE: "${CHART_RELEASE}"
+#    CHART_VERSION: "${CHART_VERSION}"
 
 
 EOF
