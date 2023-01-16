@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "service-voucher.fullname" . }}
+  labels:
+    {{- include "service-voucher.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "service-voucher.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "service-voucher.serviceName" . }}
+  updateStrategy:
+    type: {{ .Values.updateStrategyType }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "service-voucher.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "service-voucher.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.podEnv }}
+          env:
+            {{- toYaml .Values.podEnv | nindent 12 }}
+          {{- end }}
+          {{- with .Values.podCommand }}
+          command:
+          {{- range . }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.podArgs }}
+          args:
+          {{- range . }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: actuator-port
+              containerPort: 8888
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          tty: true
+          stdin: true
+          volumeMounts:
+            - mountPath: /var/db/saCamDB/
+              name: data
+            - name: config-volume
+              mountPath: /app/config/custom.yaml
+              subPath: custom.yaml
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "service-voucher.fullname" . }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        {{- toYaml .Values.volumeClaimSpec | nindent 8 }}

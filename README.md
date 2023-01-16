@@ -18,3 +18,4 @@ helm repo add --username <username> --password <access_token> enthus-experimenta
 - [api-deployment](charts/api-deployment): Deployment Chart for API
 - [default](charts/default): Default Chart created by `helm create`
 - [sensa](charts/sensa): Deployment Chart for Sensa Bot
+- [service-voucher](charts/service-voucher): Deployment Chart for service voucher app
