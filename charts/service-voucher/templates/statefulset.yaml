@@ -62,12 +62,16 @@ spec:
             httpGet:
               path: /
               port: http
-            {{- toYaml .Values.podLivenessProbe | nindent 12 }}
+            {{- with .Values.podLivenessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           readinessProbe:
             httpGet:
               path: /
               port: http
-            {{- toYaml .Values.podReadinessProbe | nindent 12 }}
+            {{- with .Values.podReadinessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           tty: true
