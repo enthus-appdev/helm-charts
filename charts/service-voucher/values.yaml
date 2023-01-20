@@ -38,6 +38,13 @@ podEnv: []
 podCommand: []
 podArgs: []
 
+podLivenessProbe: {}
+  # initialDelaySeconds: 3
+  # periodSeconds: 3
+podReadinessProbe: {}
+  # initialDelaySeconds: 3
+  # periodSeconds: 3
+
 securityContext: {}
   # capabilities:
   #   drop:
