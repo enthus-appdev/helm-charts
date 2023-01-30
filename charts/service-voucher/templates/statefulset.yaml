@@ -60,16 +60,23 @@ spec:
               containerPort: 8888
           livenessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /.monitoring/NodeStatus
+              port: actuator-port
             {{- with .Values.podLivenessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /.monitoring/NodeStatus
+              port: actuator-port
             {{- with .Values.podReadinessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          startupProbe:
+            httpGet:
+              path: /.monitoring/NodeStatus
+              port: actuator-port
+            {{- with .Values.podstartupProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
