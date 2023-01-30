@@ -76,7 +76,7 @@ spec:
             httpGet:
               path: /.monitoring/NodeStatus
               port: actuator-port
-            {{- with .Values.podstartupProbe }}
+            {{- with .Values.podStartupProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:

@@ -40,7 +40,7 @@ podArgs: []
 
 podLivenessProbe: {}
 podReadinessProbe: {}
-podstartupProbe: {}
+podStartupProbe: {}
 
 securityContext: {}
   # capabilities:
