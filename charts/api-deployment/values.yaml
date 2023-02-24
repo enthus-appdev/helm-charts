@@ -75,10 +75,16 @@ resources: {}
 
 autoscaling:
   enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  config:
+    minReplicas: 1
+    maxReplicas: 10
+#    metrics:
+#      - type: Resource
+#        resource:
+#          name: cpu
+#          target:
+#            type: Utilization
+#            averageUtilization: 80
 
 nodeSelector: {}
 
