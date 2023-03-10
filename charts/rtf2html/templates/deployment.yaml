@@ -33,6 +33,24 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if or .Values.serial.rtf2html .Values.serial.html2rtf }}
+          env:
+            {{- if .Values.serial.rtf2html }}
+            - name: SERIAL_R2H
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "rtf2html.fullname" . }}
+                  key: serial-rtf2html
+            {{- end }}
+            {{- if .Values.serial.html2rtf }}
+            - name: SERIAL_H2R
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "rtf2html.fullname" . }}
+                  key: serial-html2rtf
+            {{- end }}
+          {{- end }}
+
           ports:
             - name: http
               containerPort: 8080
