@@ -50,11 +50,11 @@ spec:
                   key: serial-html2rtf
             {{- end }}
           {{- end }}
-
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
+{{/* disabled until native grpc probes are supported
           livenessProbe:
             httpGet:
               path: /
@@ -63,6 +63,7 @@ spec:
             httpGet:
               path: /
               port: http
+*/}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
