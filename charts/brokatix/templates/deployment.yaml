@@ -39,7 +39,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.config }}
           args:
-            - --configfile /etc/brokatix/config.yaml
+            - run
           {{- end }}
           ports:
             - name: http
