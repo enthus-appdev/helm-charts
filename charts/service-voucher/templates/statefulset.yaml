@@ -5,9 +5,6 @@ metadata:
   labels:
     {{- include "service-voucher.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "service-voucher.selectorLabels" . | nindent 6 }}
@@ -56,39 +53,34 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-            - name: actuator-port
+            - name: actuator
               containerPort: 8888
           livenessProbe:
             httpGet:
               path: /.monitoring/NodeStatus
-              port: actuator-port
+              port: actuator
             {{- with .Values.podLivenessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           readinessProbe:
             httpGet:
               path: /.monitoring/NodeStatus
-              port: actuator-port
+              port: actuator
             {{- with .Values.podReadinessProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           startupProbe:
             httpGet:
               path: /.monitoring/NodeStatus
-              port: actuator-port
+              port: actuator
             {{- with .Values.podStartupProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          tty: true
-          stdin: true
           volumeMounts:
-            - mountPath: /var/db/saCamDB/
+            - mountPath: /var/db/saCamDB
               name: data
-            - name: config-volume
-              mountPath: /app/config/custom.yaml
-              subPath: custom.yaml
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -101,10 +93,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: config-volume
-          configMap:
-            name: {{ include "service-voucher.fullname" . }}
   volumeClaimTemplates:
     - metadata:
         name: data
