@@ -76,11 +76,18 @@ spec:
             {{- with .Values.podStartupProbe }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          stdin: true
+          tty: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /var/db/saCamDB
               name: data
+            - mountPath: /app/config/custom.yaml
+              name: config
+              subPath: custom.yaml
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -93,6 +100,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "service-voucher.fullname" . }}
   volumeClaimTemplates:
     - metadata:
         name: data

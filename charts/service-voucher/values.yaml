@@ -93,3 +93,5 @@ volumeClaimSpec: {}
   # resources:
   #   requests:
   #     storage: 5Gi
+
+config: {}
