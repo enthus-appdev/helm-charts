@@ -45,6 +45,7 @@ affinity: {}
 podEnv: []
 
 schedule: ""
+timeZone: ""
 #startingDeadlineSeconds: 0
 
 config: ""

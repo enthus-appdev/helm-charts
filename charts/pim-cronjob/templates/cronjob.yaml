@@ -6,6 +6,7 @@ metadata:
     {{- include "pim-cronjob.labels" . | nindent 4 }}
 spec:
   schedule: {{ .Values.schedule | quote }}
+  timeZone: {{ .Values.timeZone | quote }}
   concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: {{ .Values.startingDeadlineSeconds }}
   jobTemplate:
