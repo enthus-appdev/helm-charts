@@ -1,0 +1,106 @@
+apiVersion: v1
+entries:
+  api-deployment:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.132783707Z"
+    description: Deployment Helm chart for API
+    digest: dfb92c302daf75206f86872d6b8935c8cd83a387028dea34a58d66dbf69d7141
+    maintainers:
+    - name: enthus GmbH
+    name: api-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.3.1/api-deployment-0.3.1.tgz
+    version: 0.3.1
+  brokatix:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.259709869Z"
+    description: A Helm chart for Kubernetes
+    digest: 6b16ec5e6f58ae8accfd096a78df1bdb71b1df6c14af944cd934ca28cc459367
+    maintainers:
+    - name: enthus GmbH
+    name: brokatix
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/brokatix-0.1.4/brokatix-0.1.4.tgz
+    version: 0.1.4
+  default:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.394448649Z"
+    description: A Helm chart for Kubernetes
+    digest: 41e19b5a5e3a5429c173d24dff6c017cb39e63a4dbad041d05803b2316a8e938
+    maintainers:
+    - name: enthus GmbH
+    name: default
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/default-0.2.1/default-0.2.1.tgz
+    version: 0.2.1
+  nexus:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.515657276Z"
+    description: A Helm chart for Kubernetes
+    digest: f56ed7675b53b7fbe0dcf292ab9cf4a990e865266bd77ce9d4ff6abf64e3091e
+    maintainers:
+    - name: enthus GmbH
+    name: nexus
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/nexus-0.4.1/nexus-0.4.1.tgz
+    version: 0.4.1
+  pim-cronjob:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.630332998Z"
+    description: A Helm chart for Kubernetes
+    digest: 2b4463f2db536e68fc41191f04dccda9bb74bd6bf65f3d431f2bcdc3cb87949c
+    maintainers:
+    - name: enthus GmbH
+    name: pim-cronjob
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
+    version: 0.2.1
+  rtf2html:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.949706727Z"
+    description: A Helm chart for Kubernetes
+    digest: 4bd9ebbc46f7fad968f5e4bb8649c33b933481a79eb4e218488f156646effe19
+    maintainers:
+    - name: enthus GmbH
+    name: rtf2html
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/rtf2html-0.2.2/rtf2html-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:44.738807091Z"
+    description: A Helm chart for Kubernetes
+    digest: c70dba836b8e9dd9cc245805ec0cf09d5c5ee0925b3964f949c9440c269f6b59
+    maintainers:
+    - name: enthus GmbH
+    name: rtf2html
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/rtf2html-0.2.1/rtf2html-0.2.1.tgz
+    version: 0.2.1
+  service-voucher:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-08-26T14:14:45.125575769Z"
+    description: A Helm chart for Kubernetes
+    digest: 1cedc589f892334a5cc99df76c894503c43e79663610cbb0a31249625a57d8c5
+    maintainers:
+    - name: enthus GmbH
+    name: service-voucher
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/service-voucher-1.1.1/service-voucher-1.1.1.tgz
+    version: 1.1.1
+generated: "2024-08-26T14:14:45.125592811Z"
