@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "negsoft-operator.fullname" . }}
+  labels:
+    {{- include "negsoft-operator.labels" . | nindent 4 }}
+spec:
+  strategy:
+    type: Recreate
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "negsoft-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "negsoft-operator.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "negsoft-operator.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: MSSQL_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: mssqlHostname
+            - name: MSSQL_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: mssqlPort
+            - name: MSSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: mssqlUsername
+            - name: MSSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: mssqlPassword
+            - name: REDIS_ADDRESSES
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: redisAddresses
+            - name: REDIS_MASTER_SET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: redisMasterSet
+            - name: REDIS_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: redisDatabase
+            - name: CRONJOB_PREFIX
+              value: {{ .Values.cronjobPrefix }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "negsoft-operator.fullname" . }}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
