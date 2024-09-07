@@ -13,6 +13,17 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.3.1/api-deployment-0.3.1.tgz
     version: 0.3.1
+  api-subscription:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2024-09-07T17:43:44.758727784Z"
+    description: A Helm chart for Kubernetes
+    digest: 39e6c5bb679250cf7aa30a88fb54f0f0d9fb4a7a828906b7efb0ea47e0661f8b
+    name: api-subscription
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-subscription-0.1.0/api-subscription-0.1.0.tgz
+    version: 0.1.0
   brokatix:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -114,4 +125,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/service-voucher-1.1.1/service-voucher-1.1.1.tgz
     version: 1.1.1
-generated: "2024-09-07T02:18:50.728776677Z"
+generated: "2024-09-07T17:43:44.758744445Z"
