@@ -115,11 +115,11 @@ spec:
         - name: {{ .name | quote }}
           secret:
             secretName: {{ .secretName | quote }}
-            optional: {{ .optional | default false }}
+            optional: {{ .optional | default false }} # Ensure configmap is present by default
         {{- end }}
         {{- range .Values.configMaps }}
         - name: {{ .name | quote }}
           configMap:
             name: {{ .configMapName | quote }}
-            optional: {{ .optional | default false }}
+            optional: {{ .optional | default false }} # Ensure configmap is present by default
         {{- end }}
