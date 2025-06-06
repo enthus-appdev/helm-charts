@@ -1,0 +1,60 @@
+{{- define "negsoft-operator.cronjob_template" -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "negsoft-operator.fullname" . }}
+  labels:
+    {{- include "negsoft-operator.labels" . | nindent 4 }}
+spec:
+  schedule: ""
+  timeZone: "Europe/Berlin"
+  concurrencyPolicy: "Forbid"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "negsoft-operator.labels" . | nindent 8 }}
+            {{- with .Values.podLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: cronjob
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "" # is overridden by operator
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              env:
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /var/run/secret/cloud.google.com/service-account.json
+              volumeMounts:
+                - name: config
+                  mountPath: /etc/nx
+                  readOnly: true
+                - name: gcp-service-account
+                  mountPath: /var/run/secret/cloud.google.com
+                  readOnly: true
+                - name: files
+                  mountPath: /mnt/files
+          volumes:
+            - name: config
+              configMap:
+                name: "" # is overridden by operator
+            - name: gcp-service-account
+              secret:
+                secretName: "" # is overridden by operator
+            - name: files
+              emptyDir: {} # is overridden by operator
+          restartPolicy: OnFailure
+{{- end }}

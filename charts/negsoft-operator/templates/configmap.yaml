@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "negsoft-operator.fullname" . }}
+data:
+  template_cronjob.yaml: |-
+    {{- include "negsoft-operator.cronjob_template" . | nindent 4 }}

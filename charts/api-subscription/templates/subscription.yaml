@@ -1,0 +1,22 @@
+apiVersion: enthus.de/v1
+kind: NegSoftSubscription
+metadata:
+  name: {{ include "api-subscription.fullname" . }}
+spec:
+  imageRepository: {{.Values.image.repository | quote}}
+  imageTag: {{.Values.image.tag | quote}}
+  configMapName: {{ include "api-subscription.fullname" . }}
+  googleServiceAccountSecretName: {{.Values.gcp.serviceAccount | quote}}
+  persistentVolumeClaimName: {{.Values.volume.data.volumeClaim | quote}}
+  {{- with .Values.args }}
+  preCommands:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.resources }}
+  resources:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.affinity }}
+  affinity:
+    {{ toYaml . | nindent 4}}
+  {{- end }}

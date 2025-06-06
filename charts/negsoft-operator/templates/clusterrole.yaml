@@ -1,0 +1,33 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "negsoft-operator.labels" . | nindent 4 }}
+  name: {{ include "negsoft-operator.fullname" . }}-update-cronjobs
+rules:
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+    verbs:
+      - list
+      - create
+      - update
+      - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "negsoft-operator.labels" . | nindent 4 }}
+  name: {{ include "negsoft-operator.fullname" . }}-read-subscriptions
+rules:
+  - apiGroups:
+      - enthus.de
+    resources:
+      - negsoftsubscriptions
+    verbs:
+      - list
+      - watch
+{{- end -}}

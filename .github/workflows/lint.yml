@@ -1,0 +1,26 @@
+name: "Lint Helm Charts"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "charts/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint Charts"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Helm charts
+        run: helm lint charts/*
