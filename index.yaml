@@ -3,6 +3,18 @@ entries:
   api-deployment:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-06-06T14:06:27.821188778Z"
+    description: Deployment Helm chart for API
+    digest: 2cc97ec4a090302ff9b98d21b8917624c508036c0e65ab108b1fdec342ce05ad
+    maintainers:
+    - name: enthus GmbH
+    name: api-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.4.0/api-deployment-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-08-26T14:14:44.132783707Z"
     description: Deployment Helm chart for API
     digest: dfb92c302daf75206f86872d6b8935c8cd83a387028dea34a58d66dbf69d7141
@@ -125,4 +137,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/service-voucher-1.1.1/service-voucher-1.1.1.tgz
     version: 1.1.1
-generated: "2024-09-07T17:43:44.758744445Z"
+generated: "2025-06-06T14:06:27.821200862Z"
