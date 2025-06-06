@@ -79,12 +79,12 @@ spec:
           {{- range .Values.secrets }}
             - name: {{ .name | quote }}
               mountPath: {{ .mountPath | quote }}
-              readOnly: {{ .readOnly | default true }} # Enforce read-only by default
+              readOnly: {{ .readOnly | default true }} # Enforce read-only by default to enhance security
           {{- end }}
           {{- range .Values.configMaps }}
             - name: {{ .name | quote }}
               mountPath: {{ .mountPath | quote }}
-              readOnly: {{ .readOnly | default true }} # Enforce read-only by default
+              readOnly: {{ .readOnly | default true }} # Enforce read-only by default to enhance security
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
