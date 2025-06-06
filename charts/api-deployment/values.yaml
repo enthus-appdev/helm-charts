@@ -97,9 +97,43 @@ args: []
 
 config: {}
 
-gcp:
-  serviceAccount: ""
-  projectID: ""
+env: []
+  # - name: MY_STATIC_VAR
+  #   value: "my_value"
+  # - name: MY_CONFIG_VAR
+  #   valueFrom:
+  #     configMapKeyRef:
+  #       name: my-configmap
+  #       key: config-key
+  #       optional: false
+  # - name: MY_SECRET_VAR
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: my-secret
+  #       key: secret-key
+  #       optional: false
+
+envFrom: []
+  # - configMapRef:
+  #     name: my-configmap
+  #     optional: false
+  # - secretRef:
+  #     name: my-secret
+  #     optional: false
+
+secrets: []
+  # - name: cert-secret
+  #   secretName: my-certificate-secret
+  #   mountPath: /etc/certs
+  #   readOnly: true
+  #   optional: false
+
+configMaps: []
+  # - name: app-config
+  #   configMapName: my-app-config
+  #   mountPath: /etc/config
+  #   readOnly: true
+  #   optional: false
 
 volume:
   data:
