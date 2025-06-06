@@ -1,0 +1,51 @@
+# Example values.yaml configuration for certificate loading
+
+# Load certificate from a secret and reference it via environment variable
+secrets:
+  - name: tls-cert
+    secretName: my-tls-certificate
+    mountPath: /etc/ssl/certs
+    readOnly: true
+
+env:
+  # Static environment variables
+  - name: CERT_PATH
+    value: "/etc/ssl/certs/tls.crt"
+  - name: KEY_PATH
+    value: "/etc/ssl/certs/tls.key"
+  - name: SSL_VERIFY
+    value: "true"
+  
+  # Load environment variable from a secret
+  - name: DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: database-secret
+        key: password
+        optional: false
+  
+  # Load environment variable from a configmap
+  - name: API_BASE_URL
+    valueFrom:
+      configMapKeyRef:
+        name: app-config
+        key: api-url
+        optional: false
+
+envFrom:
+  # Load all environment variables from a secret
+  - secretRef:
+      name: app-secrets
+      optional: false
+  
+  # Load all environment variables from a configmap
+  - configMapRef:
+      name: app-config
+      optional: false
+
+# Mount additional configmaps
+configMaps:
+  - name: app-config-files
+    configMapName: application-config
+    mountPath: /etc/app-config
+    readOnly: true

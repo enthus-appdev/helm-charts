@@ -42,12 +42,13 @@ spec:
             - {{ . | quote }}
           {{- end }}
           {{- end }}
+          {{- with .Values.env }}
           env:
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /var/run/secret/cloud.google.com/service-account.json
-          {{- if ne .Values.gcp.projectID "" }}
-            - name: GOOGLE_CLOUD_PROJECT
-              value: {{ .Values.gcp.projectID | quote }}
+            {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 14 }}
           {{- end }}
           ports:
             - name: http
@@ -73,11 +74,18 @@ spec:
               mountPath: /etc/nx
               readOnly: true
           {{- end }}
-            - name: gcp-service-account
-              mountPath: /var/run/secret/cloud.google.com
-              readOnly: true
             - name: files
               mountPath: /mnt/files
+          {{- range .Values.secrets }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: {{ .readOnly | default true }} # Enforce read-only by default
+          {{- end }}
+          {{- range .Values.configMaps }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: {{ .readOnly | default true }} # Enforce read-only by default
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -96,13 +104,22 @@ spec:
           configMap:
             name: {{ include "api-deployment.fullname" $ }}
         {{- end }}
-        - name: gcp-service-account
-          secret:
-            secretName: {{ .Values.gcp.serviceAccount }}
         - name: files
         {{- with .Values.volume.data.volumeClaim }}
           persistentVolumeClaim:
             claimName: {{ . }}
         {{- else }}
           emptyDir: {}
+        {{- end }}
+        {{- range .Values.secrets }}
+        - name: {{ .name | quote }}
+          secret:
+            secretName: {{ .secretName | quote }}
+            optional: {{ .optional | default false }}
+        {{- end }}
+        {{- range .Values.configMaps }}
+        - name: {{ .name | quote }}
+          configMap:
+            name: {{ .configMapName | quote }}
+            optional: {{ .optional | default false }}
         {{- end }}
