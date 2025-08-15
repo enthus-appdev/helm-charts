@@ -20,3 +20,19 @@ spec:
   affinity:
     {{ toYaml . | nindent 4}}
   {{- end }}
+  {{- with .Values.env }}
+  env:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.envFrom }}
+  envFrom:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.secrets }}
+  secrets:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.configMaps }}
+  configMaps:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
