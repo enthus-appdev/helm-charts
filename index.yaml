@@ -65,6 +65,16 @@ entries:
   negsoft-operator:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2025-08-15T13:28:09.651229517Z"
+    description: A Helm chart for Kubernetes
+    digest: bc8a177164d8a2908ed0d8325c789d436e8e5423ed00cc281a4b64bb3d996c6e
+    name: negsoft-operator
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/negsoft-operator-0.2.0/negsoft-operator-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2024-09-07T02:18:50.72876211Z"
     description: A Helm chart for Kubernetes
     digest: 2b33ba12d538a5fc65d7259f7e2a155c77ff5b1cef0808240db14650c9731975
@@ -137,4 +147,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/service-voucher-1.1.1/service-voucher-1.1.1.tgz
     version: 1.1.1
-generated: "2025-06-06T14:06:27.821200862Z"
+generated: "2025-08-15T13:28:09.651251247Z"
