@@ -35,15 +35,9 @@ spec:
                 {{- toYaml .Values.securityContext | nindent 16 }}
               image: "" # is overridden by operator
               imagePullPolicy: {{ .Values.image.pullPolicy }}
-              env:
-                - name: GOOGLE_APPLICATION_CREDENTIALS
-                  value: /var/run/secret/cloud.google.com/service-account.json
               volumeMounts:
                 - name: config
                   mountPath: /etc/nx
-                  readOnly: true
-                - name: gcp-service-account
-                  mountPath: /var/run/secret/cloud.google.com
                   readOnly: true
                 - name: files
                   mountPath: /mnt/files
@@ -51,9 +45,6 @@ spec:
             - name: config
               configMap:
                 name: "" # is overridden by operator
-            - name: gcp-service-account
-              secret:
-                secretName: "" # is overridden by operator
             - name: files
               emptyDir: {} # is overridden by operator
           restartPolicy: OnFailure
