@@ -91,6 +91,14 @@ readinessProbe:
   timeoutSeconds: 3
   failureThreshold: 3
 
+# Startup probe - allows longer startup time for repository cloning
+startupProbe:
+  enabled: false
+  path: /api/health
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30  # 30 * 10s = 5 minutes max startup time
+
 autoscaling:
   enabled: false
   minReplicas: 1

@@ -68,6 +68,15 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.startupProbe.path }}
+              port: http
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
