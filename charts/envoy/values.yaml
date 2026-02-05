@@ -122,3 +122,13 @@ config:
   claude:
     path: claude
     maxConcurrent: 3
+  # Cloud repository configuration
+  # Repositories are auto-cloned on first deployment
+  # Example:
+  # repositories:
+  #   - name: "my-repo"
+  #     url: "github.com/owner/repo"
+  #     isDefault: true
+  #     description: "Main repository"
+  #     color: "#3B82F6"
+  repositories: []

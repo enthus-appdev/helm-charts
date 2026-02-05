@@ -36,3 +36,8 @@ data:
   CLAUDE_CODE_PATH: {{ .path | quote }}
   MAX_CONCURRENT_TASKS: {{ .maxConcurrent | quote }}
   {{- end }}
+
+  # Repositories configuration (cloud deployment)
+  {{- if .Values.config.repositories }}
+  ENVOY_REPOSITORIES: {{ .Values.config.repositories | toJson | quote }}
+  {{- end }}
