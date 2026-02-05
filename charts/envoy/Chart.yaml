@@ -1,0 +1,8 @@
+apiVersion: v2
+name: envoy
+description: Jira to Claude Code Automation - Local web interface for autonomous development
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: "enthus GmbH"
