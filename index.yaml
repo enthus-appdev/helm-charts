@@ -62,6 +62,20 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/default-0.2.1/default-0.2.1.tgz
     version: 0.2.1
+  envoy:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-02-05T13:46:30.358378377Z"
+    description: Jira to Claude Code Automation - Local web interface for autonomous
+      development
+    digest: 5035fb55380c693728463b0a969a50f4544674cafb5f64fd9b15db64d8c328b7
+    maintainers:
+    - name: enthus GmbH
+    name: envoy
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/envoy-0.1.0/envoy-0.1.0.tgz
+    version: 0.1.0
   negsoft-operator:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -147,4 +161,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/service-voucher-1.1.1/service-voucher-1.1.1.tgz
     version: 1.1.1
-generated: "2025-08-15T13:28:09.651251247Z"
+generated: "2026-02-05T13:46:30.358395879Z"
