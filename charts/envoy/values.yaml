@@ -130,6 +130,13 @@ config:
   claude:
     path: claude
     maxConcurrent: 3
+  # Authentication (Google OAuth)
+  auth:
+    enabled: false
+    googleClientId: ""
+    sessionSecret: ""
+    # Comma-separated list of allowed email addresses
+    allowedEmails: ""
   # Cloud repository configuration
   # Repositories are auto-cloned on first deployment
   # Example:

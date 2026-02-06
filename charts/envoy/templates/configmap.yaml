@@ -37,6 +37,16 @@ data:
   MAX_CONCURRENT_TASKS: {{ .maxConcurrent | quote }}
   {{- end }}
 
+  # Authentication configuration
+  {{- with .Values.config.auth }}
+  AUTH_ENABLED: {{ .enabled | quote }}
+  {{- if .enabled }}
+  GOOGLE_CLIENT_ID: {{ .googleClientId | quote }}
+  AUTH_SESSION_SECRET: {{ .sessionSecret | quote }}
+  AUTH_ALLOWED_EMAILS: {{ .allowedEmails | quote }}
+  {{- end }}
+  {{- end }}
+
   # Repositories configuration (cloud deployment)
   {{- if .Values.config.repositories }}
   ENVOY_REPOSITORIES: {{ .Values.config.repositories | toJson | quote }}
