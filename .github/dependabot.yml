@@ -1,8 +1,15 @@
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "daily"
+      interval: daily
+      time: "04:00"
+    labels:
+      - dependencies
+      - github-actions
     reviewers:
-      - "Fank"
+      - Fank
+    commit-message:
+      prefix: chore
+      include: scope
