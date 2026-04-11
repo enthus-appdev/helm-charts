@@ -36,4 +36,4 @@ helm install my-release enthus/<chart-name>
 
 ## Contributing
 
-Charts are linted on every push and pull request. Release tarballs are published automatically via [chart-releaser-action](https://github.com/helm/chart-releaser-action) when version tags are pushed to `main`.
+Charts are linted on every push and pull request. Release tarballs are published automatically via [chart-releaser-action](https://github.com/helm/chart-releaser-action) when version bumps are merged into `main`.
