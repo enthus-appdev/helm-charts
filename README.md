@@ -1,22 +1,39 @@
 # enthus Helm Charts
 
-## Getting started
+Helm charts maintained by enthus GmbH, published via GitHub Pages.
 
-Add the Helm charts to your helm command:
+## Usage
+
+Add the Helm repository:
+
+```shell
+helm repo add enthus https://enthus-appdev.github.io/helm-charts
+helm repo update
 ```
-helm repo add --username <username> --password <access_token> enthus-charts https://gitlab.com/api/v4/projects/42323755/packages/helm/stable
+
+Search available charts:
+
+```shell
+helm search repo enthus
 ```
 
-If you want to use the experimental/development versions use this one:
+Install a chart:
+
+```shell
+helm install my-release enthus/<chart-name>
 ```
-helm repo add --username <username> --password <access_token> enthus-experimental-charts https://gitlab.com/api/v4/projects/42323755/packages/helm/experimental
-```
 
+## Available charts
 
-## Charts
+| Chart | Description |
+|---|---|
+| [api-deployment](charts/api-deployment) | Deployment chart for the NegSoft API service |
+| [api-subscription](charts/api-subscription) | Deployment chart for the NegSoft subscription API workload |
+| [default](charts/default) | Default chart scaffold from `helm create` |
+| [negsoft-operator](charts/negsoft-operator) | Kubernetes operator for managing NegSoft user subscriptions |
+| [nexus](charts/nexus) | Internal admin UI for database operations, configuration, and cross-environment replication |
+| [pim-cronjob](charts/pim-cronjob) | Reusable Kubernetes CronJob chart for Product Information Management (PIM) workloads — importers, exporters, and generators |
 
-- [api-deployment](charts/api-deployment): Deployment Chart for API
-- [default](charts/default): Default Chart created by `helm create`
-- [rtf2html](charts/rtf2html): Deployment Chart for RTF to HTML converter
-- [sensa](charts/sensa): Deployment Chart for Sensa Bot
-- [service-voucher](charts/service-voucher): Deployment Chart for service voucher app
+## Contributing
+
+Charts are linted on every push and pull request. Release tarballs are published automatically via [chart-releaser-action](https://github.com/helm/chart-releaser-action) when version bumps are merged into `main`.
