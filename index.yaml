@@ -131,6 +131,19 @@ entries:
   nexus:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-04-30T12:32:53.814648441Z"
+    description: Internal admin UI for database operations, configuration, and cross-environment
+      replication
+    digest: be89f1140e13313f978c3669f6a34e961e5a6119389da872b656659e18e7d4e2
+    maintainers:
+    - name: enthus GmbH
+    name: nexus
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/nexus-0.5.1/nexus-0.5.1.tgz
+    version: 0.5.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-04-30T12:29:05.14664358Z"
     description: Internal admin UI for database operations, configuration, and cross-environment
       replication
@@ -193,4 +206,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-04-30T12:29:05.146679196Z"
+generated: "2026-04-30T12:32:53.814711285Z"
