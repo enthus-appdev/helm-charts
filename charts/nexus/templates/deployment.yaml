@@ -1,3 +1,4 @@
+{{- include "nexus.validateConfigProvider" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,13 +14,16 @@ spec:
       {{- include "nexus.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        {{- if eq .Values.config.provider "configMap" }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "nexus.labels" . | nindent 8 }}
-	{{- with .Values.podLabels }}
+        {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -51,22 +55,29 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-          {{- with .Values.config }}
+            {{- if .Values.config.provider }}
             - name: config
-              mountPath: /config
+              mountPath: {{ .Values.config.mountPath }}
               readOnly: true
-          {{- end }}
-          {{- with .Values.volumeMounts }}
+            {{- end }}
+            {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
-          {{- end }}
+            {{- end }}
       volumes:
-        {{- with .Values.config }}
+        {{- if eq .Values.config.provider "configMap" }}
         - name: config
           configMap:
-            name: {{ include "nexus.fullname" $ }}
+            name: {{ include "nexus.fullname" . }}
+        {{- else if eq .Values.config.provider "secretProviderClass" }}
+        - name: config
+          csi:
+            driver: {{ .Values.config.secretProviderClass.driver }}
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.config.secretProviderClass.name }}
         {{- end }}
         {{- with .Values.volumes }}
-          {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

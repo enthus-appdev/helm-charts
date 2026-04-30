@@ -98,4 +98,35 @@ tolerations: []
 
 affinity: {}
 
-config: {}
+# Application configuration. The container reads a `config.json` file
+# mounted at `config.mountPath`. Pick exactly one provider:
+#
+#   provider: ""                     -> nothing is mounted; the caller
+#                                       wires the file through some other
+#                                       volume in `.Values.volumes`.
+#   provider: "configMap"            -> the chart renders a ConfigMap
+#                                       from `config.configMap.values`.
+#   provider: "secretProviderClass"  -> the chart mounts a CSI volume
+#                                       backed by a Secret Store CSI
+#                                       SecretProviderClass. Set
+#                                       `secretProviderClass.create: true`
+#                                       to also render the SPC resource.
+config:
+  provider: ""
+  mountPath: /config
+
+  configMap:
+    values: {}
+
+  secretProviderClass:
+    name: ""
+    create: false
+    provider: gke
+    driver: secrets-store-gke.csi.k8s.io
+    # Forwarded to `parameters.secrets` when `create: true`. To preserve
+    # the legacy ConfigMap shape, expose a single file named
+    # `config.json`:
+    #   secrets:
+    #     - resourceName: "projects/<project>/secrets/<secret>/versions/latest"
+    #       path: "config.json"
+    secrets: []

@@ -60,3 +60,21 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Validate config.provider. Allowed values:
+  ""                    -> no /config volume mounted (caller wires its own)
+  "configMap"           -> render ConfigMap from config.configMap.values
+  "secretProviderClass" -> mount Secret Store CSI volume
+*/}}
+{{- define "nexus.validateConfigProvider" -}}
+{{- $p := .Values.config.provider -}}
+{{- if not (has $p (list "" "configMap" "secretProviderClass")) -}}
+{{- fail (printf "config.provider must be one of \"\", \"configMap\", \"secretProviderClass\"; got %q" $p) -}}
+{{- end -}}
+{{- if eq $p "secretProviderClass" -}}
+{{- if not .Values.config.secretProviderClass.name -}}
+{{- fail "config.provider=secretProviderClass requires config.secretProviderClass.name" -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
