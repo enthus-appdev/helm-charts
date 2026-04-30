@@ -8,8 +8,6 @@ updates:
     labels:
       - dependencies
       - github-actions
-    reviewers:
-      - Fank
     commit-message:
       prefix: chore
       include: scope
