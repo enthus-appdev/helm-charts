@@ -14,13 +14,20 @@ spec:
       {{- include "nexus.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- $configMapChecksum := eq .Values.config.provider "configMap" }}
+      {{- $spcChecksum := and (eq .Values.config.provider "secretProviderClass") .Values.config.secretProviderClass.create }}
+      {{- if or $configMapChecksum $spcChecksum .Values.podAnnotations }}
       annotations:
-        {{- if eq .Values.config.provider "configMap" }}
+        {{- if $configMapChecksum }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if $spcChecksum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secretproviderclass.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- end }}
       labels:
         {{- include "nexus.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}

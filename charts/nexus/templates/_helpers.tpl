@@ -72,9 +72,26 @@ Validate config.provider. Allowed values:
 {{- if not (has $p (list "" "configMap" "secretProviderClass")) -}}
 {{- fail (printf "config.provider must be one of \"\", \"configMap\", \"secretProviderClass\"; got %q" $p) -}}
 {{- end -}}
+{{- if $p -}}
+{{- if not .Values.config.mountPath -}}
+{{- fail "config.mountPath is required when config.provider is set" -}}
+{{- end -}}
+{{- end -}}
 {{- if eq $p "secretProviderClass" -}}
-{{- if not .Values.config.secretProviderClass.name -}}
+{{- $spc := .Values.config.secretProviderClass -}}
+{{- if not $spc.name -}}
 {{- fail "config.provider=secretProviderClass requires config.secretProviderClass.name" -}}
+{{- end -}}
+{{- if not $spc.driver -}}
+{{- fail "config.provider=secretProviderClass requires config.secretProviderClass.driver" -}}
+{{- end -}}
+{{- if $spc.create -}}
+{{- if not $spc.provider -}}
+{{- fail "config.secretProviderClass.create=true requires config.secretProviderClass.provider" -}}
+{{- end -}}
+{{- if not $spc.secrets -}}
+{{- fail "config.secretProviderClass.create=true requires a non-empty config.secretProviderClass.secrets list" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end }}
