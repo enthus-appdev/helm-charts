@@ -1,7 +1,12 @@
+{{- include "nexus.validateConfigProvider" . -}}
+{{- if eq .Values.config.provider "configMap" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "nexus.fullname" . }}
+  labels:
+    {{- include "nexus.labels" . | nindent 4 }}
 data:
   config.json: |-
-    {{- toJson .Values.config | nindent 4 }}
+    {{- toJson .Values.config.configMap.values | nindent 4 }}
+{{- end }}
