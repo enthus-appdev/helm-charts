@@ -25,6 +25,10 @@ resources: {}
 
 affinity: {}
 
+nodeSelector: {}
+
+tolerations: []
+
 args: []
 
 config: {}

@@ -19,6 +19,14 @@ spec:
   affinity:
     {{ toYaml . | nindent 4}}
   {{- end }}
+  {{- with .Values.nodeSelector }}
+  nodeSelector:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
+  {{- with .Values.tolerations }}
+  tolerations:
+    {{ toYaml . | nindent 4}}
+  {{- end }}
   {{- with .Values.env }}
   env:
     {{ toYaml . | nindent 4}}
