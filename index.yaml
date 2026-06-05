@@ -40,6 +40,18 @@ entries:
   api-subscription:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-06-05T19:14:16.045556819Z"
+    description: Deployment chart for the NegSoft subscription API workload
+    digest: 3d739505ffe239090d4911825e8e0d57ea08e3cc6139df83ff6cb01f6b1914c9
+    maintainers:
+    - name: enthus-appdev
+    name: api-subscription
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-subscription-0.3.0/api-subscription-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-04-11T17:42:39.464617661Z"
     description: Deployment chart for the NegSoft subscription API workload
     digest: d29c488bfb0b4c16c287c1f9c2fb4448d165e839047018526ae3b4a6ec26f155
@@ -206,4 +218,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-04-30T12:32:53.814711285Z"
+generated: "2026-06-05T19:14:16.045598988Z"
