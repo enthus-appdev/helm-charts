@@ -81,3 +81,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Arbitrary objects rendered verbatim alongside the release, e.g. Traefik
+# IngressRoute/Middleware CRDs the built-in templates do not cover. Each entry
+# may be a structured map or a raw YAML string block, and is run through `tpl`,
+# so values may reference .Release/.Values. Because entries are templated, treat
+# this as deploy-time trusted input only — do not source it from untrusted callers.
+extraObjects: []
