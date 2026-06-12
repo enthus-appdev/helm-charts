@@ -1,0 +1,30 @@
+{{- if .Values.schedule }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "healthcheck.fullname" . }}
+  labels:
+    {{- include "healthcheck.labels" . | nindent 4 }}
+    mcl.sh/name: healthcheck
+spec:
+  schedule: {{ .Values.schedule | quote }}
+  {{- with .Values.timeZone }}
+  timeZone: {{ . | quote }}
+  {{- end }}
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 300
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            {{- include "healthcheck.labels" . | nindent 12 }}
+            mcl.sh/name: healthcheck
+        spec:
+          {{- include "healthcheck.podSpec" . | nindent 10 }}
+{{- end }}
