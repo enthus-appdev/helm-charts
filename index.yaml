@@ -49,6 +49,59 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.3.1/api-deployment-0.3.1.tgz
     version: 0.3.1
+  api-job-cronjob:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-06-12T18:52:25.071339819Z"
+    description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
+    digest: ff8b14cf793939f8a127e5d2fe22ac61919074c0bb5c21e8299d43ac262372cf
+    maintainers:
+    - name: enthus GmbH
+    name: api-job-cronjob
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.5.0/api-job-cronjob-0.5.0.tgz
+    version: 0.5.0
+  api-manager-deployment:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-06-12T18:52:25.296067578Z"
+    description: Deployment chart for the NegSoft manager (cross-service orchestration)
+      service
+    digest: 26f6a9794788a56f8bf9f40eda8b2a76916b7ced4d0aff901e3be7800fc34dd1
+    maintainers:
+    - name: enthus GmbH
+    name: api-manager-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-manager-deployment-0.5.0/api-manager-deployment-0.5.0.tgz
+    version: 0.5.0
+  api-notification-deployment:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-06-12T18:52:25.544435697Z"
+    description: Deployment chart for the NegSoft notification WebSocket service
+    digest: ab0fe13142fbb3f4d4ab2b1538edb6e664eda0f24f4b4bf5ea60ad1437814268
+    maintainers:
+    - name: enthus GmbH
+    name: api-notification-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-notification-deployment-0.3.0/api-notification-deployment-0.3.0.tgz
+    version: 0.3.0
+  api-portal-deployment:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-06-12T18:52:25.795050564Z"
+    description: Deployment chart for the NegSoft Portal (customer-facing) API service
+    digest: 32c4747fc32113da6e271916a3f53da7450e66cedf572f2e06ee49686d2c52d4
+    maintainers:
+    - name: enthus GmbH
+    name: api-portal-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-portal-deployment-0.4.0/api-portal-deployment-0.4.0.tgz
+    version: 0.4.0
   api-subscription:
   - apiVersion: v2
     appVersion: 1.0.0
@@ -256,4 +309,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-12T18:36:40.794588756Z"
+generated: "2026-06-12T18:52:25.795091049Z"
