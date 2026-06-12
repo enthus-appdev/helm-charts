@@ -99,22 +99,24 @@ containers:
         value: {{ .Values.cookieName | quote }}
       - name: EXPECTED_SHA
         value: {{ .Values.expectedSha | quote }}
+      {{- $targets := .Values.targets | default dict }}
       - name: API_BASE
-        value: {{ .Values.targets.apiBase | quote }}
+        value: {{ $targets.apiBase | default "" | quote }}
       - name: GUI_BASE
-        value: {{ .Values.targets.guiBase | quote }}
+        value: {{ $targets.guiBase | default "" | quote }}
       - name: LEGACY_BASE
-        value: {{ .Values.targets.legacyBase | quote }}
+        value: {{ $targets.legacyBase | default "" | quote }}
       - name: REPLICA_BASES
-        value: {{ join "," (.Values.targets.replicas | default (list)) | quote }}
+        value: {{ join "," ($targets.replicas | default (list)) | quote }}
       - name: SHOT
         value: /tmp/render.png
-      {{- if .Values.discord.webhookSecretName }}
+      {{- $discord := .Values.discord | default dict }}
+      {{- if $discord.webhookSecretName }}
       - name: DISCORD_WEBHOOK_URL
         valueFrom:
           secretKeyRef:
-            name: {{ .Values.discord.webhookSecretName | quote }}
-            key: {{ .Values.discord.webhookSecretKey | quote }}
+            name: {{ $discord.webhookSecretName | quote }}
+            key: {{ $discord.webhookSecretKey | default "webhook-url" | quote }}
             optional: false
       {{- end }}
     resources:

@@ -6,9 +6,6 @@ metadata:
   labels:
     {{- include "healthcheck.labels" . | nindent 4 }}
     mcl.sh/name: healthcheck
-  annotations:
-    # Render the Job only on demand (e.g. CI post-deploy with a unique suffix).
-    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   backoffLimit: 0
   activeDeadlineSeconds: 300
