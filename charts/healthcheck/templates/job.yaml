@@ -1,0 +1,20 @@
+{{- if .Values.job.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "healthcheck.fullname" . }}-{{ .Values.job.suffix | default "run" }}
+  labels:
+    {{- include "healthcheck.labels" . | nindent 4 }}
+    mcl.sh/name: healthcheck
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 300
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        {{- include "healthcheck.labels" . | nindent 8 }}
+        mcl.sh/name: healthcheck
+    spec:
+      {{- include "healthcheck.podSpec" . | nindent 6 }}
+{{- end }}

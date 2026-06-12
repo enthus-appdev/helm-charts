@@ -1,0 +1,79 @@
+# Default values for the post-deploy health check.
+#
+# This chart only runs the probe image; the probe code and the per-environment
+# values (target service DNS, identity, cookie) live in the private
+# negsoft-healthcheck repo. Defaults below are placeholders — every deployment
+# supplies a values file.
+
+# Probe image (private — pulled in-cluster). Pin a sha-<commit> tag per
+# environment for reproducibility; `latest` is only the placeholder default.
+image:
+  repository: europe-west3-docker.pkg.dev/mcl-development/ghcr-enthus-appdev-remote/enthus-appdev/negsoft-healthcheck
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Context label shown in the report.
+envLabel: ""
+
+# Reporting policy: "always" posts every run, "failure" posts only on red.
+reportOn: failure
+
+# Source IP the probe presents for its read-only identity. Set per environment.
+sourceIp: ""
+
+# Session cookie name the probe reads back. Environment-specific; set per env.
+cookieName: ""
+
+# If set, the probe asserts the deployed build matches this commit SHA.
+# Empty = reachability only.
+expectedSha: ""
+
+# In-cluster targets (ClusterIP service URLs). Set per environment.
+targets:
+  apiBase: ""
+  guiBase: ""
+  legacyBase: ""
+  # Replica services to liveness-check. Empty -> skipped.
+  replicas: []
+
+discord:
+  # Kubernetes Secret holding the Discord webhook URL (created out-of-band,
+  # never templated through values). Empty -> reporting disabled.
+  webhookSecretName: ""
+  webhookSecretKey: webhook-url
+
+# Ambient schedule. "" disables the CronJob (e.g. environments that scale to
+# zero outside work hours and run only on deploy).
+schedule: ""
+timeZone: "Europe/Berlin"
+
+# On-demand one-shot Job, rendered only when enabled (e.g. a CI post-deploy run
+# with a unique suffix).
+job:
+  enabled: false
+  suffix: run
+
+# Optional NetworkPolicy. Off by default to match clusters that don't enforce
+# NetworkPolicy. Enable on clusters that do (e.g. Dataplane V2) and supply the
+# ingress/egress rules the probe needs (egress to the target services, DNS, and
+# the reporting webhook).
+networkPolicy:
+  enabled: false
+  ingress: []
+  egress: []
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
