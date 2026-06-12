@@ -135,6 +135,18 @@ configMaps: []
   #   readOnly: true
   #   optional: false
 
+# CSI-mounted secrets (Secrets Store CSI driver + Workload Identity): the pod's identity
+# fetches the secret from the cloud secret manager and mounts it as a file (never in etcd).
+# A container reads it from the mount path, e.g. via an *_FILE env var. Default off (empty).
+csiSecrets: []
+  # - name: my-secret
+  #   mountPath: /var/run/secret/my-secret
+  #   secretProviderClass: my-secret-provider
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: "projects/my-project/secrets/my-secret/versions/latest"
+  #       path: "my-secret-file"
+
 volume:
   data:
     volumeClaim: ""
