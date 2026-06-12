@@ -86,6 +86,11 @@ spec:
               mountPath: {{ .mountPath | quote }}
               readOnly: {{ .readOnly | default true }} # Enforce read-only by default to enhance security
           {{- end }}
+          {{- range .Values.csiSecrets }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: true
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -122,4 +127,12 @@ spec:
           configMap:
             name: {{ .configMapName | quote }}
             optional: {{ .optional | default false }} # Ensure configmap is present by default
+        {{- end }}
+        {{- range .Values.csiSecrets }}
+        - name: {{ .name | quote }}
+          csi:
+            driver: {{ .driver | default "secrets-store-gke.csi.k8s.io" }}
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .secretProviderClass | quote }}
         {{- end }}
