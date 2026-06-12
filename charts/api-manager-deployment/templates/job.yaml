@@ -1,0 +1,107 @@
+{{- define "api-manager-deployment.job" -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "api-manager-deployment.fullname" . }}-job
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "api-manager-deployment.labels" . | nindent 4 }}
+spec:
+  completions: 1
+  backoffLimit: 5
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api-manager-deployment.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.job.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-job
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.job.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+          {{- range .Values.globalArgs }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 14 }}
+          {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 14 }}
+          {{- end }}
+          resources:
+            {{ toYaml .Values.job.resources | nindent 12 }}
+          volumeMounts:
+            {{- with .Values.config }}
+            - name: config
+              mountPath: /etc/nx
+              readOnly: true
+            {{- end }}
+            - name: files
+              mountPath: /mnt/files
+          {{- range .Values.secrets }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: {{ .readOnly | default true }}
+          {{- end }}
+          {{- range .Values.configMaps }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: {{ .readOnly | default true }}
+          {{- end }}
+      {{- with .Values.job.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.job.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.job.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- with .Values.config }}
+        - name: config
+          configMap:
+            name: {{ include "api-manager-deployment.fullname" $ }}
+        {{- end }}
+        - name: files
+          {{- if .Values.volume.data.volumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.data.volumeClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- range .Values.secrets }}
+        - name: {{ .name | quote }}
+          secret:
+            secretName: {{ .secretName | quote }}
+            optional: {{ .optional | default false }}
+        {{- end }}
+        {{- range .Values.configMaps }}
+        - name: {{ .name | quote }}
+          configMap:
+            name: {{ .configMapName | quote }}
+            optional: {{ .optional | default false }}
+        {{- end }}
+      restartPolicy: Never
+{{- end }}

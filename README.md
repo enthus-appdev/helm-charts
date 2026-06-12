@@ -28,6 +28,10 @@ helm install my-release enthus/<chart-name>
 | Chart | Description |
 |---|---|
 | [api-deployment](charts/api-deployment) | Deployment chart for the NegSoft API service |
+| [api-job-cronjob](charts/api-job-cronjob) | Reusable CronJob chart for the NegSoft job service (scheduled tasks) |
+| [api-manager-deployment](charts/api-manager-deployment) | Deployment chart for the NegSoft manager (cross-service orchestration) service |
+| [api-notification-deployment](charts/api-notification-deployment) | Deployment chart for the NegSoft notification WebSocket service |
+| [api-portal-deployment](charts/api-portal-deployment) | Deployment chart for the NegSoft Portal (customer-facing) API service |
 | [api-subscription](charts/api-subscription) | Deployment chart for the NegSoft subscription API workload |
 | [default](charts/default) | Default chart scaffold from `helm create` |
 | [negsoft-operator](charts/negsoft-operator) | Kubernetes operator for managing NegSoft user subscriptions |

@@ -1,0 +1,18 @@
+{{- if .Values.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "api-portal-deployment.fullname" . }}
+spec:
+  {{- if .Values.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- end}}
+  {{- if .Values.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end}}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "api-portal-deployment.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      mcl.sh/name: {{ .Chart.Name }}
+{{- end }}

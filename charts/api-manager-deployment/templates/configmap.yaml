@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api-manager-deployment.fullname" . }}
+data:
+  config.yaml: |-
+    {{- toYaml .Values.config | nindent 4 }}
+  template_job.yaml: |-
+    {{- include "api-manager-deployment.job" . | nindent 4 }}

@@ -1,0 +1,138 @@
+{{- range $i, $job := .Values.cronjobs }}
+{{ if gt $i 0 }}---{{ end }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  {{- $name := default $job.name $job.nameOverride }}
+  name: {{ printf "%s-%s" (include "api-job-cronjob.fullname" $) $name | lower | trunc 52 | trimSuffix "-"}}
+  labels:
+    app.kubernetes.io/name: {{ include "api-job-cronjob.name" $ }}
+    helm.sh/chart: {{ include "api-job-cronjob.chart" $ }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    mcl.sh/name: cronjob
+    mcl.sh/job: {{ $job.name }}
+spec:
+  {{- $timeZone := default $.Values.timeZone $job.timeZone }}
+  {{- with $timeZone }}
+  timeZone: {{ . | quote }}
+  {{- end }}
+  schedule: {{ $job.schedule | quote }}
+  concurrencyPolicy: "Forbid"
+  {{- $startingDeadlineSeconds := default $.Values.startingDeadlineSeconds $job.startingDeadlineSeconds }}
+  {{- with $startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ . }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+        {{- with $.Values.podAnnotations }}
+          annotations:
+            {{ toYaml . | nindent 12 }}
+        {{- end }}
+          labels:
+            app.kubernetes.io/name: {{ include "api-job-cronjob.name" $ }}
+            app.kubernetes.io/instance: {{ $.Release.Name }}
+            mcl.sh/name: cronjob
+            mcl.sh/job: {{ $job.name }}
+        spec:
+          serviceAccountName: {{ include "api-job-cronjob.serviceAccountName" $ }}
+          containers:
+            - name: {{ printf "%s-%s" $.Chart.Name $job.name | lower | trunc 63 | trimSuffix "-" }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              args:
+                {{- range $.Values.extraArgs }}
+                - {{ . | quote }}
+                {{- end }}
+                - "--name"
+                - {{ $job.name | quote }}
+              {{- with $.Values.env }}
+              env:
+                {{- toYaml . | nindent 14 }}
+              {{- end }}
+              {{- with $.Values.envFrom }}
+              envFrom:
+                {{- toYaml . | nindent 14 }}
+              {{- end }}
+              {{- $resources := default $.Values.resources $job.resources }}
+              resources:
+                {{ toYaml $resources | nindent 16 }}
+              volumeMounts:
+              {{- with $.Values.config }}
+                - name: config
+                  mountPath: /etc/nx
+                  readOnly: true
+              {{- end }}
+                - name: files
+                  mountPath: /mnt/files
+              {{- range $.Values.secrets }}
+                - name: {{ .name | quote }}
+                  mountPath: {{ .mountPath | quote }}
+                  readOnly: {{ .readOnly | default true }}
+              {{- end }}
+              {{- range $.Values.configMaps }}
+                - name: {{ .name | quote }}
+                  mountPath: {{ .mountPath | quote }}
+                  readOnly: {{ .readOnly | default true }}
+              {{- end }}
+              {{- range $.Values.csiSecrets }}
+                - name: {{ .name | quote }}
+                  mountPath: {{ .mountPath | quote }}
+                  readOnly: true
+              {{- end }}
+        {{- $nodeSelector := default $.Values.nodeSelector $job.nodeSelector -}}
+        {{- with $nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- $affinity := default $.Values.affinity $job.affinity -}}
+        {{- with $affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- $tolerations := default $.Values.tolerations $job.tolerations -}}
+        {{- with $tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with $.Values.image.pullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+          volumes:
+          {{- with $.Values.config }}
+            - name: config
+              configMap:
+                name: {{ include "api-job-cronjob.fullname" $ }}
+          {{- end }}
+            - name: files
+            {{- if $.Values.volume.data.volumeClaim }}
+              persistentVolumeClaim:
+                claimName: {{ $.Values.volume.data.volumeClaim }}
+            {{- else }}
+              emptyDir: {}
+            {{- end }}
+          {{- range $.Values.secrets }}
+            - name: {{ .name | quote }}
+              secret:
+                secretName: {{ .secretName | quote }}
+                optional: {{ .optional | default false }}
+          {{- end }}
+          {{- range $.Values.configMaps }}
+            - name: {{ .name | quote }}
+              configMap:
+                name: {{ .configMapName | quote }}
+                optional: {{ .optional | default false }}
+          {{- end }}
+          {{- range $.Values.csiSecrets }}
+            - name: {{ .name | quote }}
+              csi:
+                driver: {{ .driver | default "secrets-store-gke.csi.k8s.io" }}
+                readOnly: true
+                volumeAttributes:
+                  secretProviderClass: {{ .secretProviderClass | quote }}
+          {{- end }}
+          restartPolicy: OnFailure
+{{- end }}
