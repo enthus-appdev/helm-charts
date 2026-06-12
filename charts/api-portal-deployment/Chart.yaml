@@ -1,0 +1,8 @@
+apiVersion: v2
+name: api-portal-deployment
+description: Deployment chart for the NegSoft Portal (customer-facing) API service
+type: application
+version: 0.4.0
+appVersion: "1.0.0"
+maintainers:
+  - name: "enthus GmbH"

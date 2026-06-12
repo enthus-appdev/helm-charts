@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "api-portal-deployment.fullname" . }}-test-connection"
+  labels:
+    app.kubernetes.io/name: {{ include "api-portal-deployment.name" . }}
+    helm.sh/chart: {{ include "api-portal-deployment.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "api-portal-deployment.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

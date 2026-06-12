@@ -1,0 +1,153 @@
+# Default values for manager.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: "ghcr.io/enthus-appdev/negsoft-api/manager"
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+rbac:
+  create: true
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# job template
+job:
+  # The K8s service account name for spawned jobs.
+  # Should match the cron chart's SA since these jobs run the same binary.
+  serviceAccountName: ""
+
+  image:
+    repository: "ghcr.io/enthus-appdev/negsoft-api/job"
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+globalArgs: []
+args: []
+
+env: []
+  # - name: MY_STATIC_VAR
+  #   value: "my_value"
+  # - name: MY_CONFIG_VAR
+  #   valueFrom:
+  #     configMapKeyRef:
+  #       name: my-configmap
+  #       key: config-key
+  #       optional: false
+  # - name: MY_SECRET_VAR
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: my-secret
+  #       key: secret-key
+  #       optional: false
+
+envFrom: []
+  # - configMapRef:
+  #     name: my-configmap
+  #     optional: false
+  # - secretRef:
+  #     name: my-secret
+  #     optional: false
+
+secrets: []
+  # - name: cert-secret
+  #   secretName: my-certificate-secret
+  #   mountPath: /etc/certs
+  #   readOnly: true
+  #   optional: false
+
+configMaps: []
+  # - name: app-config
+  #   configMapName: my-app-config
+  #   mountPath: /etc/config
+  #   readOnly: true
+  #   optional: false
+
+# CSI-mounted secrets (Secrets Store CSI driver + Workload Identity): the pod's identity
+# fetches the secret from the cloud secret manager and mounts it as a file (never in etcd).
+# A container reads it from the mount path, e.g. via an *_FILE env var. Per-service specifics
+# (the SQL password secret + DATABASE_MSSQL_PASSWORD_FILE env) live in the deployment values.
+# Default off (empty).
+csiSecrets: []
+  # - name: my-secret
+  #   mountPath: /var/run/secret/my-secret
+  #   secretProviderClass: my-secret-provider
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: "projects/my-project/secrets/my-secret/versions/latest"
+  #       path: "my-secret-file"
+
+volume:
+  data:
+    volumeClaim: ""
+
+config: {}
