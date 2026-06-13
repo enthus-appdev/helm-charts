@@ -110,3 +110,8 @@ secret:
   redisDatabase: "0"
 
 cronjobPrefix: ""
+
+crds:
+  # Install the NegSoftSubscription CRD with the chart. Disable if CRDs are
+  # managed out-of-band (e.g. GitOps applying the operator repo's apis/).
+  install: true

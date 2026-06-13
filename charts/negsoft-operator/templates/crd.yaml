@@ -1,0 +1,9 @@
+{{- if .Values.crds.install }}
+{{/*
+  Synced from negsoft-subscription-operator/apis (controller-gen output).
+  Lives in templates/ (not crds/) so `helm upgrade` installs it on operators
+  that were already released; the file carries resource-policy keep so existing
+  NegSoftSubscription CRs survive a helm uninstall.
+*/}}
+{{ .Files.Get "files/crd-negsoftsubscriptions.yaml" }}
+{{- end }}
