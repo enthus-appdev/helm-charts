@@ -189,6 +189,19 @@ entries:
   healthcheck:
   - apiVersion: v2
     appVersion: "1.0"
+    created: "2026-06-13T06:06:36.280717313Z"
+    description: In-cluster post-deploy health-check probe (browser render + API +
+      live-query round-trip) that reports red/green to Discord.
+    digest: 2b4ceaf768a24da0d9e6a3a668b2527a71e2ed85390f1b6653fe73ec2169dd5d
+    maintainers:
+    - name: enthus GmbH
+    name: healthcheck
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/healthcheck-0.2.0/healthcheck-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: "1.0"
     created: "2026-06-12T18:09:12.042700022Z"
     description: In-cluster post-deploy health-check probe (browser render + API +
       live-query round-trip) that reports red/green to Discord.
@@ -309,4 +322,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-12T18:52:25.795091049Z"
+generated: "2026-06-13T06:06:36.280757699Z"
