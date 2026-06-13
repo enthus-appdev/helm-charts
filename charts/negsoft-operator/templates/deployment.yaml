@@ -78,6 +78,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "negsoft-operator.fullname" . }}-secret
                   key: redisDatabase
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: redisPassword
             - name: CRONJOB_PREFIX
               value: {{ .Values.cronjobPrefix }}
           volumeMounts:
