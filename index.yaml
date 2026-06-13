@@ -216,6 +216,16 @@ entries:
   negsoft-operator:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-06-13T11:48:40.789883672Z"
+    description: Kubernetes operator for managing NegSoft user subscriptions
+    digest: 6f8f32fb70aa7c7584c029fe3077e3391b8b732e5f45e3100d01ec048372cfaf
+    name: negsoft-operator
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/negsoft-operator-0.5.0/negsoft-operator-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-13T11:02:54.652935527Z"
     description: Kubernetes operator for managing NegSoft user subscriptions
     digest: 278ba87ff818601fdbc328197dae65d8994d585da5b249eaf84bfddf7cc60020
@@ -342,4 +352,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-13T11:02:54.652991962Z"
+generated: "2026-06-13T11:48:40.789916153Z"
