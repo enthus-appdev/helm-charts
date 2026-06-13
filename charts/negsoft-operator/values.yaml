@@ -103,6 +103,7 @@ affinity: {}
 secret:
   mssqlHostname: ""
   mssqlPort: "1433"
+  mssqlDatabase: ""
   mssqlUsername: ""
   mssqlPassword: ""
   redisAddresses: ""

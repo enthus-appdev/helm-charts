@@ -53,6 +53,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "negsoft-operator.fullname" . }}-secret
                   key: mssqlPort
+            - name: MSSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "negsoft-operator.fullname" . }}-secret
+                  key: mssqlDatabase
             - name: MSSQL_USERNAME
               valueFrom:
                 secretKeyRef:
