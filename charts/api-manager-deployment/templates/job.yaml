@@ -66,6 +66,11 @@ spec:
               mountPath: {{ .mountPath | quote }}
               readOnly: {{ .readOnly | default true }}
           {{- end }}
+          {{- range .Values.csiSecrets }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: true
+          {{- end }}
       {{- with .Values.job.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
@@ -102,6 +107,14 @@ spec:
           configMap:
             name: {{ .configMapName | quote }}
             optional: {{ .optional | default false }}
+        {{- end }}
+        {{- range .Values.csiSecrets }}
+        - name: {{ .name | quote }}
+          csi:
+            driver: {{ .driver | default "secrets-store-gke.csi.k8s.io" }}
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .secretProviderClass | quote }}
         {{- end }}
       restartPolicy: Never
 {{- end }}
