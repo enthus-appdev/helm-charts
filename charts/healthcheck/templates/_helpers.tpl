@@ -119,6 +119,23 @@ containers:
             key: {{ $discord.webhookSecretKey | default "webhook-url" | quote }}
             optional: false
       {{- end }}
+      {{- $portal := .Values.portal | default dict }}
+      - name: PORTAL_API_BASE
+        value: {{ $portal.apiBase | default "" | quote }}
+      {{- if $portal.credentialsSecretName }}
+      - name: PORTAL_EMAIL
+        valueFrom:
+          secretKeyRef:
+            name: {{ $portal.credentialsSecretName | quote }}
+            key: {{ $portal.credentialsEmailKey | default "email" | quote }}
+            optional: false
+      - name: PORTAL_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: {{ $portal.credentialsSecretName | quote }}
+            key: {{ $portal.credentialsPasswordKey | default "password" | quote }}
+            optional: false
+      {{- end }}
     resources:
       {{- toYaml .Values.resources | nindent 6 }}
     volumeMounts:

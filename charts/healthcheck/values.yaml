@@ -50,6 +50,19 @@ discord:
   webhookSecretName: ""
   webhookSecretKey: webhook-url
 
+# Portal (customer-facing) health check. Separate customer identity from the
+# employee flow: a real login with credentials from a Secret (never templated).
+# Runs only when apiBase AND the credentials Secret are both set; otherwise the
+# probe skips the portal checks. Set per environment.
+portal:
+  # Portal Go API ClusterIP service base (e.g. http://api-portal.<ns>.svc:8080).
+  apiBase: ""
+  # Kubernetes Secret holding the monitor customer's portal login (created
+  # out-of-band, never templated). Keys default to email / password.
+  credentialsSecretName: ""
+  credentialsEmailKey: email
+  credentialsPasswordKey: password
+
 # Ambient schedule. "" disables the CronJob (e.g. environments that scale to
 # zero outside work hours and run only on deploy).
 schedule: ""
