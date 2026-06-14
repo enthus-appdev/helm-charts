@@ -1,8 +1,6 @@
 # Default values for entpdf.
-# entpdf is a stateless PDF/A-3 converter (FastAPI). Its production path
-# (POST /convert-pdf) is pure pikepdf and has no external dependencies. The
-# HTML path (POST /generate-pdf) needs Gotenberg, which the NegSoft API does
-# NOT use, so GOTENBERG_URL is left unset by default.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
 replicaCount: 2
 
@@ -17,9 +15,12 @@ nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # entpdf accesses no GCP resources, so no Workload Identity annotation is needed.
+  # Specifies whether a service account should be created
   create: true
+  # Annotations to add to the service account
   annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podStrategyType: RollingUpdate
@@ -31,8 +32,6 @@ podDisruptionBudget:
 podAnnotations: {}
 podLabels: {}
 
-# The container runs rootless (uid 1000) with a read-only root filesystem;
-# /tmp is provided as an emptyDir for veraPDF scratch files.
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
@@ -53,16 +52,12 @@ service:
   type: ClusterIP
   port: 8000
 
-# Container listen port (uvicorn). Set via the PORT env below as well.
 containerPort: 8000
 
-# Environment variables passed to the container. WORKERS stays at 1 because
-# Prometheus metrics use the per-process default registry; scale via replicas.
 env:
   - name: WORKERS
     value: "1"
 
-# Extra raw env entries (valueFrom, etc.) appended verbatim.
 extraEnv: []
 
 resources:
@@ -101,8 +96,6 @@ autoscaling:
             type: Utilization
             averageUtilization: 70
 
-# Node scheduling. Empty by default: a 24/7 service lands on the untainted
-# np-services pool. Set tolerations/nodeSelector only for the Spot pools.
 nodeSelector: {}
 tolerations: []
 affinity: {}
