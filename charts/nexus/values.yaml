@@ -79,6 +79,13 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+# Additional container environment variables. Useful for the `_FILE`
+# convention: point an app setting at a CSI-mounted secret file rather than
+# baking the value into config.
+env: []
+# - name: DATABASE_PRODUCTIVE_PASSWORD_FILE
+#   value: /config/productive-password
+
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo
