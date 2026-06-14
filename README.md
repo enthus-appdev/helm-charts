@@ -34,6 +34,7 @@ helm install my-release enthus/<chart-name>
 | [api-portal-deployment](charts/api-portal-deployment) | Deployment chart for the NegSoft Portal (customer-facing) API service |
 | [api-subscription](charts/api-subscription) | Deployment chart for the NegSoft subscription API workload |
 | [default](charts/default) | Default chart scaffold from `helm create` |
+| [entpdf](charts/entpdf) | PDF/A-3 converter for ZUGFeRD/Factur-X e-invoices (PDF2PDFA replacement) |
 | [negsoft-operator](charts/negsoft-operator) | Kubernetes operator for managing NegSoft user subscriptions |
 | [nexus](charts/nexus) | Internal admin UI for database operations, configuration, and cross-environment replication |
 | [pim-cronjob](charts/pim-cronjob) | Reusable Kubernetes CronJob chart for Product Information Management (PIM) workloads — importers, exporters, and generators |

@@ -1,0 +1,13 @@
+{{ include "entpdf.fullname" . }} deployed.
+
+Internal endpoint (ClusterIP, same namespace):
+  http://{{ include "entpdf.fullname" . }}:{{ .Values.service.port }}
+
+Fully qualified:
+  http://{{ include "entpdf.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+Point the NegSoft API config key EntPDFHTTPAddress at that URL.
+
+Health check:
+  kubectl -n {{ .Release.Namespace }} run curl --rm -it --image=curlimages/curl --restart=Never -- \
+    curl -fsS http://{{ include "entpdf.fullname" . }}:{{ .Values.service.port }}/health
