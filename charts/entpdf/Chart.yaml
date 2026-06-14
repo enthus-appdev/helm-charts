@@ -1,0 +1,8 @@
+apiVersion: v2
+name: entpdf
+description: PDF/A-3 converter for ZUGFeRD/Factur-X e-invoices (PDF2PDFA replacement). Stateless FastAPI service called in-cluster by the NegSoft API.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+maintainers:
+  - name: "enthus GmbH"
