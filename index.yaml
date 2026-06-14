@@ -199,6 +199,20 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/default-0.2.1/default-0.2.1.tgz
     version: 0.2.1
+  entpdf:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-06-14T13:13:31.739083346Z"
+    description: PDF/A-3 converter for ZUGFeRD/Factur-X e-invoices (PDF2PDFA replacement).
+      Stateless FastAPI service called in-cluster by the NegSoft API.
+    digest: f61aefbe8c0d3eee853cd372af9a223ec2a42898e0a3fc3d37ba07e720ec0c8f
+    maintainers:
+    - name: enthus GmbH
+    name: entpdf
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/entpdf-0.1.0/entpdf-0.1.0.tgz
+    version: 0.1.0
   healthcheck:
   - apiVersion: v2
     appVersion: "1.0"
@@ -365,4 +379,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-13T13:54:31.69181288Z"
+generated: "2026-06-14T13:13:31.739124593Z"
