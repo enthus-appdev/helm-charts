@@ -6,10 +6,11 @@
 # supplies a values file.
 
 # Probe image (private — pulled in-cluster). Pin a sha-<commit> tag per
-# environment for reproducibility; `latest` is only the placeholder default.
+# environment for reproducibility.
 image:
-  repository: europe-west3-docker.pkg.dev/mcl-development/ghcr-enthus-appdev-remote/enthus-appdev/negsoft-healthcheck
-  tag: latest
+  repository: ghcr.io/enthus-appdev/negsoft-healthcheck
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
   pullPolicy: IfNotPresent
 
 nameOverride: ""
