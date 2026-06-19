@@ -37,6 +37,13 @@ cookieName: ""
 # Empty = reachability only.
 expectedSha: ""
 
+# Optional checks (legacy, portal, replicas) that MUST run for this environment,
+# as a comma-separated string (e.g. "portal,legacy"). An optional check whose
+# config is absent skips silently by default; listing its key here makes the
+# probe RED instead, so config drift that drops a check is caught rather than
+# passing as a smaller GREEN. Empty = no optional check is required.
+expectedChecks: ""
+
 # In-cluster targets (ClusterIP service URLs). Set per environment.
 targets:
   apiBase: ""
