@@ -109,7 +109,7 @@ containers:
       - name: REPLICA_BASES
         value: {{ join "," ($targets.replicas | default (list)) | quote }}
       - name: EXPECTED_CHECKS
-        value: {{ .Values.expectedChecks | default "" | quote }}
+        value: {{ join "," (.Values.expectedChecks | default (list)) | quote }}
       - name: SHOT
         value: /tmp/render.png
       {{- $discord := .Values.discord | default dict }}
