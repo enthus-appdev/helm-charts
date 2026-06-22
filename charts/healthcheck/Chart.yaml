@@ -2,7 +2,7 @@ apiVersion: v2
 name: healthcheck
 description: In-cluster post-deploy health-check probe (browser render + API + live-query round-trip) that reports red/green to Discord.
 type: application
-version: 0.2.1
+version: 0.3.0
 appVersion: "1.0"
 maintainers:
   - name: "enthus GmbH"
