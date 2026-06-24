@@ -60,3 +60,14 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Fail fast on conflicting or incomplete scaleToZero config.
+*/}}
+{{- define "api-deployment.scaleToZero.validate" -}}
+{{- if .Values.scaleToZero.enabled -}}
+{{- if not .Values.scaleToZero.hosts }}{{ fail "scaleToZero.enabled requires scaleToZero.hosts" }}{{- end -}}
+{{- if .Values.ingress.enabled }}{{ fail "scaleToZero and ingress are mutually exclusive — disable ingress" }}{{- end -}}
+{{- if .Values.autoscaling.enabled }}{{ fail "scaleToZero scales replicas via KEDA — disable autoscaling (HPA)" }}{{- end -}}
+{{- end -}}
+{{- end -}}
