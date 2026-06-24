@@ -60,3 +60,24 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+The tag Traefik injects and the HSO matches, so the shared interceptor can route this service
+when the path can't (stripped prefix, or an overlapping/complex match). Single-sourced so the
+two sides can't drift.
+*/}}
+{{- define "default.scaleToZero.routingHeaderName" -}}X-Keda-Target{{- end -}}
+
+{{- define "default.scaleToZero.validate" -}}
+{{- if .Values.scaleToZero.enabled -}}
+{{- $stz := .Values.scaleToZero -}}
+{{- if not $stz.hosts }}{{ fail "scaleToZero.enabled requires scaleToZero.hosts" }}{{- end -}}
+{{- if not $stz.interceptor }}{{ fail "scaleToZero.enabled requires scaleToZero.interceptor (name + namespace)" }}{{- end -}}
+{{- if not $stz.interceptor.name }}{{ fail "scaleToZero.interceptor.name is required" }}{{- end -}}
+{{- if not $stz.interceptor.namespace }}{{ fail "scaleToZero.interceptor.namespace is required" }}{{- end -}}
+{{- if and $stz.pathPrefixes $stz.paths }}{{ fail "scaleToZero: set pathPrefixes OR paths, not both" }}{{- end -}}
+{{- if and $stz.stripPrefix (not $stz.pathPrefixes) }}{{ fail "scaleToZero.stripPrefix requires pathPrefixes (the prefixes to strip)" }}{{- end -}}
+{{- if .Values.ingress.enabled }}{{ fail "scaleToZero and ingress are mutually exclusive — disable ingress" }}{{- end -}}
+{{- if .Values.autoscaling.enabled }}{{ fail "scaleToZero scales replicas via KEDA — disable autoscaling (HPA)" }}{{- end -}}
+{{- end -}}
+{{- end -}}

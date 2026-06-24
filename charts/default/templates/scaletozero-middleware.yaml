@@ -1,0 +1,30 @@
+{{- if .Values.scaleToZero.enabled }}
+{{- $fullName := include "default.fullname" . -}}
+{{- $stz := .Values.scaleToZero -}}
+{{- if $stz.stripPrefix }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-scaletozero-strip
+  labels:
+    {{- include "default.labels" . | nindent 4 }}
+spec:
+  stripPrefix:
+    prefixes:
+      {{- toYaml $stz.pathPrefixes | nindent 6 }}
+{{- end }}
+{{- if $stz.tag }}
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-scaletozero-tag
+  labels:
+    {{- include "default.labels" . | nindent 4 }}
+spec:
+  headers:
+    customRequestHeaders:
+      {{ include "default.scaleToZero.routingHeaderName" . }}: {{ $fullName | quote }}
+{{- end }}
+{{- end }}

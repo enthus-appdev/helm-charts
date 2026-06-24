@@ -1,0 +1,47 @@
+{{- if .Values.scaleToZero.enabled }}
+{{- include "default.scaleToZero.validate" . }}
+{{- $fullName := include "default.fullname" . -}}
+{{- $stz := .Values.scaleToZero -}}
+# Cross-namespace service ref → requires Traefik providers.kubernetesCRD.allowCrossNamespace=true.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}-interceptor
+  {{- with $stz.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "default.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - {{ $stz.entryPoint | default "websecure" }}
+  routes:
+    {{- range $host := $stz.hosts }}
+    {{- $clauses := list (printf "Host(`%s`)" $host) }}
+    {{- if or $stz.paths $stz.pathPrefixes }}
+    {{- $kw := ternary "Path" "PathPrefix" (not (empty $stz.paths)) }}
+    {{- $items := $stz.paths | default $stz.pathPrefixes }}
+    {{- $incl := list }}
+    {{- range $p := $items }}
+    {{- $incl = append $incl (printf "%s(`%s`)" $kw $p) }}
+    {{- end }}
+    {{- $clauses = append $clauses (printf "(%s)" (join " || " $incl)) }}
+    {{- end }}
+    - match: '{{ join " && " $clauses }}'
+      kind: Rule
+      {{- if or $stz.stripPrefix $stz.tag }}
+      middlewares:
+        {{- if $stz.stripPrefix }}
+        - name: {{ $fullName }}-scaletozero-strip
+        {{- end }}
+        {{- if $stz.tag }}
+        - name: {{ $fullName }}-scaletozero-tag
+        {{- end }}
+      {{- end }}
+      services:
+        - name: {{ $stz.interceptor.name }}
+          namespace: {{ $stz.interceptor.namespace }}
+          port: {{ $stz.interceptor.port | default 8080 }}
+    {{- end }}
+{{- end }}
