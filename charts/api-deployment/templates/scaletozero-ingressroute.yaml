@@ -1,0 +1,27 @@
+{{- if and .Values.scaleToZero.enabled .Values.scaleToZero.hosts }}
+{{- $fullName := include "api-deployment.fullname" . -}}
+{{- $stz := .Values.scaleToZero -}}
+# Cross-namespace service ref → requires Traefik providers.kubernetesCRD.allowCrossNamespace=true.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ $fullName }}-interceptor
+  {{- with $stz.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "api-deployment.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - {{ $stz.entryPoint | default "websecure" }}
+  routes:
+    {{- range $stz.hosts }}
+    - match: Host(`{{ . }}`){{- range $stz.excludePathPrefixes }} && !PathPrefix(`{{ . }}`){{- end }}
+      kind: Rule
+      services:
+        - name: {{ required "scaleToZero.interceptor.name is required" $stz.interceptor.name }}
+          namespace: {{ required "scaleToZero.interceptor.namespace is required" $stz.interceptor.namespace }}
+          port: {{ $stz.interceptor.port | default 8080 }}
+    {{- end }}
+{{- end }}
