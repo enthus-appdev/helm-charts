@@ -62,11 +62,20 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+Header the chart injects (Traefik) and matches (HSO) so the shared interceptor can route a
+strip-prefixed service. Single-sourced so the two sides cannot drift; value is the fullname.
+*/}}
+{{- define "api-deployment.scaleToZero.routingHeaderName" -}}X-Keda-Target{{- end -}}
+
+{{/*
 Fail fast on conflicting or incomplete scaleToZero config.
 */}}
 {{- define "api-deployment.scaleToZero.validate" -}}
 {{- if .Values.scaleToZero.enabled -}}
-{{- if not .Values.scaleToZero.hosts }}{{ fail "scaleToZero.enabled requires scaleToZero.hosts" }}{{- end -}}
+{{- $stz := .Values.scaleToZero -}}
+{{- if not $stz.hosts }}{{ fail "scaleToZero.enabled requires scaleToZero.hosts" }}{{- end -}}
+{{- if and $stz.pathPrefixes $stz.excludePathPrefixes }}{{ fail "scaleToZero: set pathPrefixes OR excludePathPrefixes, not both" }}{{- end -}}
+{{- if and $stz.stripPrefix (not $stz.pathPrefixes) }}{{ fail "scaleToZero.stripPrefix requires pathPrefixes (the prefixes to strip)" }}{{- end -}}
 {{- if .Values.ingress.enabled }}{{ fail "scaleToZero and ingress are mutually exclusive — disable ingress" }}{{- end -}}
 {{- if .Values.autoscaling.enabled }}{{ fail "scaleToZero scales replicas via KEDA — disable autoscaling (HPA)" }}{{- end -}}
 {{- end -}}

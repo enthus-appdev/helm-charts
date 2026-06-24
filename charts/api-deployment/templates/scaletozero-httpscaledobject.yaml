@@ -11,6 +11,17 @@ metadata:
 spec:
   hosts:
     {{- toYaml $stz.hosts | nindent 4 }}
+  pathPrefixes:
+    {{- if and $stz.pathPrefixes (not $stz.stripPrefix) }}
+    {{- toYaml $stz.pathPrefixes | nindent 4 }}
+    {{- else }}
+    - /
+    {{- end }}
+  {{- if $stz.stripPrefix }}
+  headers:
+    - name: {{ include "api-deployment.scaleToZero.routingHeaderName" . }}
+      value: {{ $fullName | quote }}
+  {{- end }}
   scaledownPeriod: {{ $stz.scaledownPeriod | default 300 }}
   scalingMetric:
     concurrency:

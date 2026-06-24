@@ -1,0 +1,27 @@
+{{- if and .Values.scaleToZero.enabled .Values.scaleToZero.stripPrefix }}
+{{- $fullName := include "api-deployment.fullname" . -}}
+{{- $stz := .Values.scaleToZero -}}
+# Strips the matched prefix so the app (which serves at root) sees the path unchanged.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-scaletozero-strip
+  labels:
+    {{- include "api-deployment.labels" . | nindent 4 }}
+spec:
+  stripPrefix:
+    prefixes:
+      {{- toYaml $stz.pathPrefixes | nindent 6 }}
+---
+# Tags the request so the shared interceptor can route it after the prefix is gone.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $fullName }}-scaletozero-tag
+  labels:
+    {{- include "api-deployment.labels" . | nindent 4 }}
+spec:
+  headers:
+    customRequestHeaders:
+      {{ include "api-deployment.scaleToZero.routingHeaderName" . }}: {{ $fullName | quote }}
+{{- end }}
