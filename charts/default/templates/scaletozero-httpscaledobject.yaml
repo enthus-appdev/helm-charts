@@ -1,0 +1,38 @@
+{{- if .Values.scaleToZero.enabled }}
+{{- include "default.scaleToZero.validate" . }}
+{{- $fullName := include "default.fullname" . -}}
+{{- $stz := .Values.scaleToZero -}}
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "default.labels" . | nindent 4 }}
+spec:
+  hosts:
+    {{- toYaml $stz.hosts | nindent 4 }}
+  pathPrefixes:
+    {{- if and $stz.pathPrefixes (not $stz.stripPrefix) }}
+    {{- toYaml $stz.pathPrefixes | nindent 4 }}
+    {{- else }}
+    - /
+    {{- end }}
+  {{- if $stz.tag }}
+  headers:
+    - name: {{ include "default.scaleToZero.routingHeaderName" . }}
+      value: {{ $fullName | quote }}
+  {{- end }}
+  scaledownPeriod: {{ $stz.scaledownPeriod | default 300 }}
+  scalingMetric:
+    concurrency:
+      targetValue: {{ $stz.targetConcurrency | default 10 }}
+  scaleTargetRef:
+    name: {{ $fullName }}
+    kind: Deployment
+    apiVersion: apps/v1
+    service: {{ $fullName }}
+    port: {{ .Values.service.port }}
+  replicas:
+    min: {{ $stz.minReplicas | default 0 }}
+    max: {{ $stz.maxReplicas | default 1 }}
+{{- end }}
