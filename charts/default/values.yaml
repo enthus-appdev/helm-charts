@@ -62,11 +62,10 @@ ingress:
 scaleToZero:
   enabled: false
   hosts: []                 # e.g. [chart-example.local]
-  # Traffic this service claims on the host — set ONE (or neither = whole-host catch-all):
-  pathPrefixes: []          # PathPrefix matchers (prefix), e.g. [/api]
-  paths: []                 # Path matchers (exact; Traefik v2 {name:regex} groups allowed), e.g. [/assets/{rest:.*}, /dynamic/erp/items]
-  stripPrefix: false        # strip the matched pathPrefixes before the interceptor (apps serving at root); needs pathPrefixes
-  tag: false                # tag the request so the shared interceptor can route it when the path can't (strip, or overlapping/complex match)
+  pathPrefixes: []          # e.g. [/api]
+  paths: []                 # exact paths, e.g. [/assets/{rest:.*}]
+  stripPrefix: false        # for apps that serve at root
+  tag: false                # when the path can't disambiguate at the interceptor
   entryPoint: websecure
   # Without the provider's ingressClass annotation Traefik silently skips the IngressRoute.
   annotations: {}           # e.g. {kubernetes.io/ingress.class: traefik}
