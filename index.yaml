@@ -189,6 +189,18 @@ entries:
   default:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-06-24T11:56:25.947897017Z"
+    description: Default chart scaffold from `helm create`
+    digest: 3ef351dd7f09bee5cb29935dd192d791c265070aa80fe724a4c9cfa1373e542f
+    maintainers:
+    - name: enthus GmbH
+    name: default
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/default-0.4.0/default-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-12T18:25:10.425781158Z"
     description: Default chart scaffold from `helm create`
     digest: c5a454bab97d5f06db1665b926db0e7cff4abc0e5c07d86fbcd5f85c407a0abe
@@ -429,4 +441,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-24T09:48:29.179307274Z"
+generated: "2026-06-24T11:56:25.947963441Z"
