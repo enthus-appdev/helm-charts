@@ -19,9 +19,6 @@ spec:
   routes:
     {{- range $host := $stz.hosts }}
     {{- $clauses := list (printf "Host(`%s`)" $host) }}
-    {{- range $p := $stz.excludePathPrefixes }}
-    {{- $clauses = append $clauses (printf "!PathPrefix(`%s`)" $p) }}
-    {{- end }}
     {{- if $stz.pathPrefixes }}
     {{- $incl := list }}
     {{- range $p := $stz.pathPrefixes }}
@@ -37,8 +34,8 @@ spec:
         - name: {{ $fullName }}-scaletozero-tag
       {{- end }}
       services:
-        - name: {{ required "scaleToZero.interceptor.name is required" $stz.interceptor.name }}
-          namespace: {{ required "scaleToZero.interceptor.namespace is required" $stz.interceptor.namespace }}
+        - name: {{ $stz.interceptor.name }}
+          namespace: {{ $stz.interceptor.namespace }}
           port: {{ $stz.interceptor.port | default 8080 }}
     {{- end }}
 {{- end }}
