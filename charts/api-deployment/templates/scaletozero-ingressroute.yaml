@@ -17,12 +17,25 @@ spec:
   entryPoints:
     - {{ $stz.entryPoint | default "websecure" }}
   routes:
-    {{- range $stz.hosts }}
-    - match: Host(`{{ . }}`){{- range $stz.excludePathPrefixes }} && !PathPrefix(`{{ . }}`){{- end }}
+    {{- range $host := $stz.hosts }}
+    {{- $clauses := list (printf "Host(`%s`)" $host) }}
+    {{- if $stz.pathPrefixes }}
+    {{- $incl := list }}
+    {{- range $p := $stz.pathPrefixes }}
+    {{- $incl = append $incl (printf "PathPrefix(`%s`)" $p) }}
+    {{- end }}
+    {{- $clauses = append $clauses (printf "(%s)" (join " || " $incl)) }}
+    {{- end }}
+    - match: {{ join " && " $clauses }}
       kind: Rule
+      {{- if $stz.stripPrefix }}
+      middlewares:
+        - name: {{ $fullName }}-scaletozero-strip
+        - name: {{ $fullName }}-scaletozero-tag
+      {{- end }}
       services:
-        - name: {{ required "scaleToZero.interceptor.name is required" $stz.interceptor.name }}
-          namespace: {{ required "scaleToZero.interceptor.namespace is required" $stz.interceptor.namespace }}
+        - name: {{ $stz.interceptor.name }}
+          namespace: {{ $stz.interceptor.namespace }}
           port: {{ $stz.interceptor.port | default 8080 }}
     {{- end }}
 {{- end }}

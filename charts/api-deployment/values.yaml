@@ -67,7 +67,9 @@ ingress:
 scaleToZero:
   enabled: false
   hosts: []                 # e.g. [chart-example.local]
-  excludePathPrefixes: []   # e.g. [/api, /ws]
+  pathPrefixes: []          # path slice this service owns (empty = whole host); e.g. [/api]
+  # Strip the matched prefix before the interceptor — for apps that serve at root.
+  stripPrefix: false
   entryPoint: websecure
   # Without the provider's ingressClass annotation Traefik silently skips the IngressRoute.
   annotations: {}           # e.g. {kubernetes.io/ingress.class: traefik}
