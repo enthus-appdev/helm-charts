@@ -67,10 +67,8 @@ ingress:
 scaleToZero:
   enabled: false
   hosts: []                 # e.g. [chart-example.local]
-  pathPrefixes: []          # the path slice this service owns; empty = whole host; e.g. [/api]
-  # Strip the matched pathPrefixes before the interceptor (apps that serve at root). The chart
-  # then tags the request with a derived header and matches it on the HSO, so the shared
-  # interceptor still routes correctly. Requires pathPrefixes.
+  pathPrefixes: []          # path slice this service owns (empty = whole host); e.g. [/api]
+  # Strip the matched prefix before the interceptor — for apps that serve at root.
   stripPrefix: false
   entryPoint: websecure
   # Without the provider's ingressClass annotation Traefik silently skips the IngressRoute.

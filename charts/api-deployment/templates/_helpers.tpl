@@ -62,14 +62,11 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Header the chart injects (Traefik) and matches (HSO) so the shared interceptor can route a
-strip-prefixed service. Single-sourced so the two sides cannot drift; value is the fullname.
+The tag Traefik injects and the HSO matches, so the shared interceptor can still route a
+strip-prefixed service after its path prefix is gone. Single-sourced so the two can't drift.
 */}}
 {{- define "api-deployment.scaleToZero.routingHeaderName" -}}X-Keda-Target{{- end -}}
 
-{{/*
-Fail fast on conflicting or incomplete scaleToZero config.
-*/}}
 {{- define "api-deployment.scaleToZero.validate" -}}
 {{- if .Values.scaleToZero.enabled -}}
 {{- $stz := .Values.scaleToZero -}}
