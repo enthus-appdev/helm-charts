@@ -43,8 +43,16 @@ cronjobs: []
 #    tolerations: []
 #    affinity: {}
 #    startingDeadlineSeconds: 0
+#    # Pod restarts before the Job counts as failed (Kubernetes default: 6 when unset).
+#    # 0 runs the job exactly once per schedule; use it for jobs that already report
+#    # per-item failures themselves and would only repeat the reports on a restart.
+#    # A per-job value wins over the global one; an explicit null renders no key
+#    # (Kubernetes default) instead of inheriting the global value.
+#    backoffLimit: 0
 
 # startingDeadlineSeconds: 0
+# Fallback for jobs without their own backoffLimit; unset = no key = Kubernetes default 6.
+# backoffLimit: 6
 timeZone: ""
 
 volume:
