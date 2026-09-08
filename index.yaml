@@ -76,6 +76,18 @@ entries:
   api-job-cronjob:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-09-08T13:30:30.761590504Z"
+    description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
+    digest: 140937d13859f4e7a1a6e04f8968999be0d260fe639e11abbfbe732ae0d5131d
+    maintainers:
+    - name: enthus GmbH
+    name: api-job-cronjob
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.6.0/api-job-cronjob-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-12T18:52:25.071339819Z"
     description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
     digest: ff8b14cf793939f8a127e5d2fe22ac61919074c0bb5c21e8299d43ac262372cf
@@ -453,4 +465,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-06-24T12:31:07.723893167Z"
+generated: "2026-09-08T13:30:30.761652826Z"
