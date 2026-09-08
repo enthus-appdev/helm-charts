@@ -25,6 +25,12 @@ spec:
   {{- end }}
   jobTemplate:
     spec:
+      {{- /* hasKey, not default: a per-job 0 is a real value, and default drops it. */}}
+      {{- $backoffLimit := $.Values.backoffLimit }}
+      {{- if hasKey $job "backoffLimit" }}{{ $backoffLimit = $job.backoffLimit }}{{ end }}
+      {{- if not (kindIs "invalid" $backoffLimit) }}
+      backoffLimit: {{ $backoffLimit }}
+      {{- end }}
       template:
         metadata:
         {{- with $.Values.podAnnotations }}
