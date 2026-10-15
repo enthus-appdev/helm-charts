@@ -45,6 +45,12 @@ service:
   annotations: {}
   type: ClusterIP
   port: 80
+  # LoadBalancer only; each is rendered when set. GKE before 1.37 needs
+  # loadBalancerClass networking.gke.io/l4-regional-external for a
+  # backend-service-based external passthrough LB. The class is immutable.
+  loadBalancerClass: ""
+  loadBalancerIP: ""        # a reserved regional address in the cluster's region
+  loadBalancerSourceRanges: []
 
 ingress:
   enabled: false
@@ -177,3 +183,12 @@ readinessProbe:
 
 livenessProbe:
   enabled: true
+
+# Native gRPC health probes (grpc.health.v1) for a workload that serves no
+# HTTP. They replace the HTTP probes above, which must then be disabled.
+grpcProbes:
+  enabled: false
+  port: 8081      # a number: gRPC probes take no named port
+  service: ""     # health service name; "" checks the whole server
+  liveness: {}    # extra probe fields, e.g. {periodSeconds: 10, failureThreshold: 3}
+  readiness: {}
