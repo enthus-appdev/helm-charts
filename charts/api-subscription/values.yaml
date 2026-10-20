@@ -33,6 +33,11 @@ args: []
 
 config: {}
 
+# Credential files rendered into the Secret <fullname>-credentials instead of the ConfigMap.
+# Mount it through `secrets` and point the matching <KEY>_FILE env var at each file.
+credentials: {}
+  # session-jwtsecret: "ref+gcpsecrets://project/secret-name"
+
 env: []
   # - name: MY_STATIC_VAR
   #   value: "my_value"
