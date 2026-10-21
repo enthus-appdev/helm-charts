@@ -1,5 +1,5 @@
 {{- range $i, $job := .Values.cronjobs }}
-{{- $signatureVolume := $job.signatureVolume | default false }}
+{{- $signatureVolume := $.Values.signatureVolume.enabled }}
 {{ if gt $i 0 }}---{{ end }}
 apiVersion: batch/v1
 kind: CronJob
@@ -130,7 +130,7 @@ spec:
                 driver: gcsfuse.csi.storage.gke.io
                 readOnly: true
                 volumeAttributes:
-                  bucketName: {{ required "signatureVolume.bucketName is required for signature jobs" $.Values.signatureVolume.bucketName | quote }}
+                  bucketName: {{ required "signatureVolume.bucketName is required when enabled" $.Values.signatureVolume.bucketName | quote }}
                   mountOptions: {{ $.Values.signatureVolume.mountOptions | quote }}
           {{- end }}
           {{- with $.Values.config }}

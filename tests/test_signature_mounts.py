@@ -55,20 +55,19 @@ class SignatureMounts(unittest.TestCase):
         with self.assertRaises(subprocess.CalledProcessError):
             render("api-deployment", {"signatureVolume": {"enabled": True}})
 
-    def test_cron_mount_is_per_job(self):
+    def test_cron_mount_is_uniform(self):
         values = {
-            "signatureVolume": {"bucketName": "test-signatures"},
+            "signatureVolume": {"enabled": True, "bucketName": "test-signatures"},
             "podAnnotations": {"example.com/existing": "kept"},
             "cronjobs": [
-                {"name": "SyncSignatures", "schedule": "0 0 * * *", "signatureVolume": True},
+                {"name": "SyncSignatures", "schedule": "0 0 * * *"},
                 {"name": "OtherJob", "schedule": "0 0 * * *"},
             ],
         }
         jobs = [d for d in render("api-job-cronjob", values) if d["kind"] == "CronJob"]
         self.assertEqual(len(jobs), 2)
-        self.assert_mount(pod_spec(jobs[0]))
-        self.assert_no_mount(pod_spec(jobs[1]))
         for job in jobs:
+            self.assert_mount(pod_spec(job))
             self.assertEqual(pod_spec(job)["metadata"]["annotations"]["example.com/existing"], "kept")
 
     def test_cron_default_off(self):
@@ -77,7 +76,7 @@ class SignatureMounts(unittest.TestCase):
         self.assert_no_mount(pod_spec(job))
 
     def test_cron_requires_bucket(self):
-        values = {"cronjobs": [{"name": "SyncSignatures", "schedule": "0 0 * * *", "signatureVolume": True}]}
+        values = {"signatureVolume": {"enabled": True}, "cronjobs": [{"name": "SyncSignatures", "schedule": "0 0 * * *"}]}
         with self.assertRaises(subprocess.CalledProcessError):
             render("api-job-cronjob", values)
 

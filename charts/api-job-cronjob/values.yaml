@@ -56,9 +56,9 @@ cronjobs: []
 timeZone: ""
 
 
-# Optional read-only signature bucket. Set signatureVolume: true on each consuming
-# cronjobs entry; unrelated jobs do not get a mount or FUSE sidecar.
+# Optional read-only signature bucket, mounted uniformly by all cron jobs.
 signatureVolume:
+  enabled: false
   bucketName: ""
   mountPath: /mnt/signatures
   mountOptions: implicit-dirs
