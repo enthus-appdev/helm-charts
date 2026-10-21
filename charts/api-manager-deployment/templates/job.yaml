@@ -19,11 +19,6 @@ spec:
         {{- end }}
         {{- if .Values.signatureVolume.enabled }}
         gke-gcsfuse/volumes: "true"
-        gke-gcsfuse/cpu-request: {{ .Values.signatureVolume.cpuRequest | quote }}
-        gke-gcsfuse/cpu-limit: {{ .Values.signatureVolume.cpuLimit | quote }}
-        gke-gcsfuse/memory-request: {{ .Values.signatureVolume.memoryRequest | quote }}
-        gke-gcsfuse/memory-limit: {{ .Values.signatureVolume.memoryLimit | quote }}
-        gke-gcsfuse/ephemeral-storage-request: {{ .Values.signatureVolume.ephemeralStorageRequest | quote }}
         {{- end }}
       {{- end }}
       labels:
