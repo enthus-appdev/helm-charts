@@ -75,6 +75,52 @@ class SignatureMounts(unittest.TestCase):
         job = next(d for d in render("api-job-cronjob", values) if d["kind"] == "CronJob")
         self.assert_no_mount(pod_spec(job))
 
+    def test_manager_and_generated_job_mounts(self):
+        values = {
+            "signatureVolume": {"enabled": True, "bucketName": "test-signatures"},
+            "job": {"serviceAccountName": "test-cron"},
+        }
+        docs = render("api-manager-deployment", values)
+        deployment = next(d for d in docs if d["kind"] == "Deployment")
+        config = next(d for d in docs if d["kind"] == "ConfigMap")
+        job = yaml.safe_load(config["data"]["template_job.yaml"])
+        self.assert_mount(pod_spec(deployment))
+        self.assert_mount(pod_spec(job))
+        self.assertEqual(pod_spec(job)["spec"]["serviceAccountName"], "test-cron")
+
+    def test_manager_requires_job_identity(self):
+        with self.assertRaises(subprocess.CalledProcessError):
+            render("api-manager-deployment", {"signatureVolume": {"enabled": True, "bucketName": "test-signatures"}})
+
+    def test_subscription_template_mount(self):
+        values = {
+            "signatureVolume": {"enabled": True, "bucketName": "test-signatures"},
+            "jobServiceAccountName": "test-cron",
+        }
+        docs = render("negsoft-operator", values)
+        config = next(d for d in docs if d["kind"] == "ConfigMap")
+        job = yaml.safe_load(config["data"]["template_cronjob.yaml"])
+        self.assert_mount(pod_spec(job))
+        self.assertEqual(pod_spec(job)["spec"]["serviceAccountName"], "test-cron")
+        controller = next(d for d in docs if d["kind"] == "Deployment")
+        self.assert_no_mount(pod_spec(controller))
+
+    def test_subscription_requires_job_identity(self):
+        with self.assertRaises(subprocess.CalledProcessError):
+            render("negsoft-operator", {"signatureVolume": {"enabled": True, "bucketName": "test-signatures"}})
+
+    def test_subscription_runner_identity(self):
+        values = {
+            "fullnameOverride": "api-subscription",
+            "serviceAccount": {
+                "create": True,
+                "annotations": {"iam.gke.io/gcp-service-account": "subscription@example.iam.gserviceaccount.com"},
+            },
+        }
+        account = next(d for d in render("api-subscription", values) if d["kind"] == "ServiceAccount")
+        self.assertEqual(account["metadata"]["name"], "api-subscription")
+        self.assertEqual(account["metadata"]["annotations"]["iam.gke.io/gcp-service-account"], "subscription@example.iam.gserviceaccount.com")
+
     def test_cron_requires_bucket(self):
         values = {"signatureVolume": {"enabled": True}, "cronjobs": [{"name": "SyncSignatures", "schedule": "0 0 * * *"}]}
         with self.assertRaises(subprocess.CalledProcessError):

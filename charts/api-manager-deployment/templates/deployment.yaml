@@ -13,6 +13,14 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.signatureVolume.enabled }}
+        gke-gcsfuse/volumes: "true"
+        gke-gcsfuse/cpu-request: {{ .Values.signatureVolume.cpuRequest | quote }}
+        gke-gcsfuse/cpu-limit: {{ .Values.signatureVolume.cpuLimit | quote }}
+        gke-gcsfuse/memory-request: {{ .Values.signatureVolume.memoryRequest | quote }}
+        gke-gcsfuse/memory-limit: {{ .Values.signatureVolume.memoryLimit | quote }}
+        gke-gcsfuse/ephemeral-storage-request: {{ .Values.signatureVolume.ephemeralStorageRequest | quote }}
+        {{- end }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -54,6 +62,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+          {{- if .Values.signatureVolume.enabled }}
+            - name: signatures
+              mountPath: {{ .Values.signatureVolume.mountPath | quote }}
+              readOnly: true
+          {{- end }}
           {{- with .Values.config }}
             - name: config
               mountPath: /etc/nx
@@ -87,6 +100,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.signatureVolume.enabled }}
+        - name: signatures
+          csi:
+            driver: gcsfuse.csi.storage.gke.io
+            readOnly: true
+            volumeAttributes:
+              bucketName: {{ required "signatureVolume.bucketName is required when enabled" .Values.signatureVolume.bucketName | quote }}
+              mountOptions: {{ .Values.signatureVolume.mountOptions | quote }}
+        {{- end }}
         {{- with .Values.config }}
         - name: config
           configMap:

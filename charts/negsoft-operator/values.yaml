@@ -110,6 +110,21 @@ secret:
   redisMasterSet: ""
   redisDatabase: "0"
 
+# Optional read-only signature bucket. Requires the GKE GCS FUSE CSI add-on.
+signatureVolume:
+  enabled: false
+  bucketName: ""
+  mountPath: /mnt/signatures
+  mountOptions: implicit-dirs
+  cpuRequest: 250m
+  cpuLimit: "0" # No CPU cap; do not let a lower request become the limit.
+  memoryRequest: 256Mi
+  memoryLimit: 256Mi
+  ephemeralStorageRequest: 100Mi
+
+# Identity of generated subscription jobs, not the operator controller.
+jobServiceAccountName: ""
+
 cronjobPrefix: ""
 
 crds:

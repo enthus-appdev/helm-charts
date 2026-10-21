@@ -12,15 +12,27 @@ spec:
   ttlSecondsAfterFinished: 3600
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- if or .Values.podAnnotations .Values.signatureVolume.enabled }}
       annotations:
-        {{ toYaml . | nindent 8 }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- if .Values.signatureVolume.enabled }}
+        gke-gcsfuse/volumes: "true"
+        gke-gcsfuse/cpu-request: {{ .Values.signatureVolume.cpuRequest | quote }}
+        gke-gcsfuse/cpu-limit: {{ .Values.signatureVolume.cpuLimit | quote }}
+        gke-gcsfuse/memory-request: {{ .Values.signatureVolume.memoryRequest | quote }}
+        gke-gcsfuse/memory-limit: {{ .Values.signatureVolume.memoryLimit | quote }}
+        gke-gcsfuse/ephemeral-storage-request: {{ .Values.signatureVolume.ephemeralStorageRequest | quote }}
+        {{- end }}
       {{- end }}
       labels:
         {{- include "api-manager-deployment.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.job.serviceAccountName }}
-      serviceAccountName: {{ . }}
+      {{- if .Values.signatureVolume.enabled }}
+      serviceAccountName: {{ required "job.serviceAccountName is required for mounted jobs" .Values.job.serviceAccountName | quote }}
+      {{- else if .Values.job.serviceAccountName }}
+      serviceAccountName: {{ .Values.job.serviceAccountName | quote }}
       {{- end }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -49,6 +61,11 @@ spec:
           resources:
             {{ toYaml .Values.job.resources | nindent 12 }}
           volumeMounts:
+          {{- if .Values.signatureVolume.enabled }}
+            - name: signatures
+              mountPath: {{ .Values.signatureVolume.mountPath | quote }}
+              readOnly: true
+          {{- end }}
             {{- with .Values.config }}
             - name: config
               mountPath: /etc/nx
@@ -84,6 +101,15 @@ spec:
         {{ toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.signatureVolume.enabled }}
+        - name: signatures
+          csi:
+            driver: gcsfuse.csi.storage.gke.io
+            readOnly: true
+            volumeAttributes:
+              bucketName: {{ required "signatureVolume.bucketName is required when enabled" .Values.signatureVolume.bucketName | quote }}
+              mountOptions: {{ .Values.signatureVolume.mountOptions | quote }}
+        {{- end }}
         {{- with .Values.config }}
         - name: config
           configMap:
