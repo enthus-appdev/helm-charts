@@ -55,6 +55,14 @@ cronjobs: []
 # backoffLimit: 6
 timeZone: ""
 
+
+# Optional read-only signature bucket, mounted uniformly by all cron jobs.
+signatureVolume:
+  enabled: false
+  bucketName: ""
+  mountPath: /mnt/signatures
+  mountOptions: implicit-dirs
+
 volume:
   data:
     volumeClaim: ""

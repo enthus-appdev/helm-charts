@@ -17,6 +17,9 @@ spec:
     metadata:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.signatureVolume.enabled }}
+        gke-gcsfuse/volumes: "true"
+        {{- end }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -76,6 +79,11 @@ spec:
           {{- end }}
             - name: files
               mountPath: /mnt/files
+          {{- if .Values.signatureVolume.enabled }}
+            - name: signatures
+              mountPath: {{ .Values.signatureVolume.mountPath | quote }}
+              readOnly: true
+          {{- end }}
           {{- range .Values.secrets }}
             - name: {{ .name | quote }}
               mountPath: {{ .mountPath | quote }}
@@ -104,6 +112,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.signatureVolume.enabled }}
+        - name: signatures
+          csi:
+            driver: gcsfuse.csi.storage.gke.io
+            readOnly: true
+            volumeAttributes:
+              bucketName: {{ required "signatureVolume.bucketName is required when enabled" .Values.signatureVolume.bucketName | quote }}
+              mountOptions: {{ .Values.signatureVolume.mountOptions | quote }}
+        {{- end }}
         {{- with .Values.config }}
         - name: config
           configMap:

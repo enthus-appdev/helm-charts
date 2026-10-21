@@ -167,6 +167,14 @@ csiSecrets: []
   #     - resourceName: "projects/my-project/secrets/my-secret/versions/latest"
   #       path: "my-secret-file"
 
+
+# Optional read-only signature bucket. Requires the GKE GCS FUSE CSI add-on.
+signatureVolume:
+  enabled: false
+  bucketName: ""
+  mountPath: /mnt/signatures
+  mountOptions: implicit-dirs
+
 volume:
   data:
     volumeClaim: ""

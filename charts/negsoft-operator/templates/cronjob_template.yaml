@@ -13,16 +13,26 @@ spec:
     spec:
       template:
         metadata:
-          {{- with .Values.podAnnotations }}
+          {{- if or .Values.podAnnotations .Values.signatureVolume.enabled }}
           annotations:
+            {{- with .Values.podAnnotations }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- if .Values.signatureVolume.enabled }}
+            gke-gcsfuse/volumes: "true"
+            {{- end }}
           {{- end }}
           labels:
-            {{- include "negsoft-operator.labels" . | nindent 8 }}
+            {{- include "negsoft-operator.labels" . | nindent 12 }}
             {{- with .Values.podLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
         spec:
+          {{- if .Values.signatureVolume.enabled }}
+          serviceAccountName: {{ required "jobServiceAccountName is required for mounted subscription jobs" .Values.jobServiceAccountName | quote }}
+          {{- else if .Values.jobServiceAccountName }}
+          serviceAccountName: {{ .Values.jobServiceAccountName | quote }}
+          {{- end }}
           {{- with .Values.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
@@ -36,12 +46,26 @@ spec:
               image: "" # is overridden by operator
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               volumeMounts:
+              {{- if .Values.signatureVolume.enabled }}
+                - name: signatures
+                  mountPath: {{ .Values.signatureVolume.mountPath | quote }}
+                  readOnly: true
+              {{- end }}
                 - name: config
                   mountPath: /etc/nx
                   readOnly: true
                 - name: files
                   mountPath: /mnt/files
           volumes:
+          {{- if .Values.signatureVolume.enabled }}
+            - name: signatures
+              csi:
+                driver: gcsfuse.csi.storage.gke.io
+                readOnly: true
+                volumeAttributes:
+                  bucketName: {{ required "signatureVolume.bucketName is required when enabled" .Values.signatureVolume.bucketName | quote }}
+                  mountOptions: {{ .Values.signatureVolume.mountOptions | quote }}
+          {{- end }}
             - name: config
               configMap:
                 name: "" # is overridden by operator
