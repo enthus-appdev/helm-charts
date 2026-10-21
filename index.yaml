@@ -3,6 +3,18 @@ entries:
   api-deployment:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-21T17:39:01.548286972Z"
+    description: Deployment chart for the NegSoft API service
+    digest: 2da0b1020b22a2e2e397e822f9f469327d113e8fa339db43f8ce03417a23d9d3
+    maintainers:
+    - name: enthus GmbH
+    name: api-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.8.0/api-deployment-0.8.0.tgz
+    version: 0.8.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-24T09:48:29.179241224Z"
     description: Deployment chart for the NegSoft API service
     digest: 35e93a44dcf95d45a85635514c5eb0fa3877c41581b33db7e2a9763b9d5e277a
@@ -76,6 +88,18 @@ entries:
   api-job-cronjob:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-21T17:39:01.748034827Z"
+    description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
+    digest: 7059741effe8579f1284993affd075a9b980d2fe85067316fd3002ffc7f07d1e
+    maintainers:
+    - name: enthus GmbH
+    name: api-job-cronjob
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.7.0/api-job-cronjob-0.7.0.tgz
+    version: 0.7.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-09-08T13:30:30.761590504Z"
     description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
     digest: 140937d13859f4e7a1a6e04f8968999be0d260fe639e11abbfbe732ae0d5131d
@@ -99,6 +123,19 @@ entries:
     - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.5.0/api-job-cronjob-0.5.0.tgz
     version: 0.5.0
   api-manager-deployment:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-10-21T17:39:02.016805282Z"
+    description: Deployment chart for the NegSoft manager (cross-service orchestration)
+      service
+    digest: 1d38db024e7a9c6393aeaab642d45e013353ffe6ca8238297b8f4cf51c3f1fc6
+    maintainers:
+    - name: enthus GmbH
+    name: api-manager-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-manager-deployment-0.7.0/api-manager-deployment-0.7.0.tgz
+    version: 0.7.0
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2026-06-13T13:54:31.691757446Z"
@@ -152,6 +189,18 @@ entries:
     - https://github.com/enthus-appdev/helm-charts/releases/download/api-portal-deployment-0.4.0/api-portal-deployment-0.4.0.tgz
     version: 0.4.0
   api-subscription:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-10-21T17:39:02.288985261Z"
+    description: Deployment chart for the NegSoft subscription API workload
+    digest: 434af12487f25a1f53913a15ff3ffa784d8da8639e56a91ba2ceeaf2f0092004
+    maintainers:
+    - name: enthus-appdev
+    name: api-subscription
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-subscription-0.5.0/api-subscription-0.5.0.tgz
+    version: 0.5.0
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2026-10-20T15:48:53.583464789Z"
@@ -328,6 +377,16 @@ entries:
   negsoft-operator:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-21T17:39:02.609360911Z"
+    description: Kubernetes operator for managing NegSoft user subscriptions
+    digest: d253cd2deca305024feec70e12e2cdd76a387f2217f49174338df0dd6fc33e5b
+    name: negsoft-operator
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/negsoft-operator-0.6.0/negsoft-operator-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-06-13T11:48:40.789883672Z"
     description: Kubernetes operator for managing NegSoft user subscriptions
     digest: 6f8f32fb70aa7c7584c029fe3077e3391b8b732e5f45e3100d01ec048372cfaf
@@ -477,4 +536,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-10-20T15:48:53.583530346Z"
+generated: "2026-10-21T17:39:02.609425917Z"
