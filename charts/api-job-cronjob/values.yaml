@@ -55,6 +55,19 @@ cronjobs: []
 # backoffLimit: 6
 timeZone: ""
 
+
+# Optional read-only signature bucket. Set signatureVolume: true on each consuming
+# cronjobs entry; unrelated jobs do not get a mount or FUSE sidecar.
+signatureVolume:
+  bucketName: ""
+  mountPath: /mnt/signatures
+  mountOptions: implicit-dirs
+  cpuRequest: 250m
+  cpuLimit: "0" # No CPU cap; do not let a lower request become the limit.
+  memoryRequest: 256Mi
+  memoryLimit: 256Mi
+  ephemeralStorageRequest: 100Mi
+
 volume:
   data:
     volumeClaim: ""
