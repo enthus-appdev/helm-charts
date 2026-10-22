@@ -47,15 +47,21 @@ class BootstrapOwnership(unittest.TestCase):
 
     def test_operator_stage_crd_switch(self):
         objects = render("negsoft-operator", "crds.install=false", "rbac.keep=true")
-        self.assertEqual(len([obj for obj in objects if obj["kind"] in CLUSTER_KINDS]), 4)
+        cluster = [obj for obj in objects if obj["kind"] in CLUSTER_KINDS]
+        self.assertEqual(len(cluster), 4)
+        for obj in cluster:
+            self.assertEqual(obj["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
 
     def test_binding_uses_runtime_service_account(self):
         for chart in ["api-manager-deployment", "negsoft-operator"]:
-            for create, name in [("true", "custom-runtime"), ("false", "external-runtime"), ("false", "")]:
+            for create, name in [("true", ""), ("true", "custom-runtime"), ("false", "external-runtime"), ("false", "")]:
                 with self.subTest(chart=chart, create=create, name=name):
                     objects = render(chart, f"serviceAccount.create={create}", f"serviceAccount.name={name}")
-                    for binding in [obj for obj in objects if obj["kind"] == "ClusterRoleBinding"]:
-                        self.assertEqual(binding["subjects"], [{"kind": "ServiceAccount", "name": name or "default",
+                    bindings = [obj for obj in objects if obj["kind"] == "ClusterRoleBinding"]
+                    self.assertEqual(len(bindings), 1 if chart == "api-manager-deployment" else 2)
+                    expected_name = name or (f"ownership-test-{chart}" if create == "true" else "default")
+                    for binding in bindings:
+                        self.assertEqual(binding["subjects"], [{"kind": "ServiceAccount", "name": expected_name,
                                                               "namespace": "runtime-test"}])
 
 

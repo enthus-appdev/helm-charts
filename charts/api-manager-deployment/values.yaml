@@ -20,7 +20,11 @@ serviceAccount:
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  # If not set and create is true, a name is generated using the fullname template.
+  # With create=false and no name, the workload AND binding use the namespace's
+  # default KSA. Set an explicit runtime KSA to avoid granting it Jobs permissions.
+  # Existing releases with custom/external KSAs need administrator review of the
+  # old binding subject before upgrading: it previously always used fullname.
   name: ""
 
 podAnnotations: {}
