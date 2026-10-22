@@ -2,6 +2,10 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  {{- if .Values.rbac.keep }}
+  annotations:
+    helm.sh/resource-policy: keep
+  {{- end }}
   labels:
     {{- include "negsoft-operator.labels" . | nindent 4 }}
   name: {{ include "negsoft-operator.fullname" . }}-update-cronjobs
@@ -17,6 +21,10 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
+  {{- if .Values.rbac.keep }}
+  annotations:
+    helm.sh/resource-policy: keep
+  {{- end }}
   labels:
     {{- include "negsoft-operator.labels" . | nindent 4 }}
   name: {{ include "negsoft-operator.fullname" . }}-read-subscriptions

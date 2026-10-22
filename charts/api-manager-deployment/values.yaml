@@ -29,7 +29,12 @@ podSecurityContext: {}
   # fsGroup: 2000
 
 rbac:
+  # Disable only after administrator bootstrap has retained and taken responsibility
+  # for these resources; removing unretained objects from a release can delete them.
   create: true
+  # Stage with create=true in an administrator upgrade before setting create=false.
+  # Verify keep in the stored release manifest, not just on the live objects.
+  keep: false
 
 securityContext: {}
   # capabilities:
