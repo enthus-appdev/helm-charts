@@ -63,6 +63,18 @@ class SubscriptionCSI(unittest.TestCase):
             render({"csiSecrets": [dict(MOUNT, create="false")]})
         self.assertIn("csiSecrets.create must be a boolean", error.exception.output)
 
+    def test_legacy_secret_retention_requires_staging_before_omission(self):
+        credentials = {"synthetic-file": "fixture-only"}
+        default = next(obj for obj in render({"credentials": credentials}) if obj["kind"] == "Secret")
+        retained = next(obj for obj in render({"credentials": credentials, "credentialsKeep": True})
+                        if obj["kind"] == "Secret")
+        self.assertNotIn("helm.sh/resource-policy", default["metadata"].get("annotations", {}))
+        self.assertEqual(retained["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
+        del retained["metadata"]["annotations"]
+        self.assertEqual(default, retained)
+        omitted = render({"credentialsKeep": True, "csiSecrets": [dict(MOUNT, create=False)]})
+        self.assertFalse(any(obj["kind"] == "Secret" for obj in omitted))
+
     def test_generated_source_provenance_and_chart_retention(self):
         content = CRD.read_bytes()
         parsed = yaml.safe_load(content)
