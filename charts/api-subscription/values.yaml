@@ -11,7 +11,9 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# Runner identity referenced by the operator-generated job template.
+# Optional KSA declaration/creation only: this does NOT select generated worker
+# identity. The operator's global jobServiceAccountName template selects it.
+# If declared here, keep this name consistent with that explicit non-default KSA.
 serviceAccount:
   create: false
   name: ""
@@ -74,6 +76,20 @@ secrets: []
   #   mountPath: /etc/certs
   #   readOnly: true
   #   optional: false
+
+# Per-subscription read-only files. This chart normally owns the namespace SPC;
+# use create:false only to reference an SPC with one other existing Helm owner.
+# No Kubernetes Secret sync. Requires the updated CRD and CSI-capable operator;
+# administrator installs schema before application values introduce this field.
+# Generated workers must use the operator template\'s explicit non-default KSA.
+csiSecrets: []
+  # - name: job-credentials
+  #   mountPath: /var/run/job-secrets
+  #   secretProviderClass: subscription-runtime
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: projects/project/secrets/name/versions/latest
+  #       path: mssql-password
 
 configMaps: []
   # - name: app-config

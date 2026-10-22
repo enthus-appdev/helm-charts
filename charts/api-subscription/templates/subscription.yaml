@@ -39,6 +39,17 @@ spec:
   secrets:
     {{ toYaml . | nindent 4}}
   {{- end }}
+  {{- with .Values.csiSecrets }}
+  csiSecrets:
+    {{- range . }}
+    - name: {{ .name | quote }}
+      mountPath: {{ .mountPath | quote }}
+      secretProviderClass: {{ required "csiSecrets.secretProviderClass is required" .secretProviderClass | quote }}
+      {{- with .driver }}
+      driver: {{ . | quote }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   {{- with .Values.configMaps }}
   configMaps:
     {{ toYaml . | nindent 4}}

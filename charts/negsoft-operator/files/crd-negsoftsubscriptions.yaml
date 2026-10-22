@@ -986,6 +986,50 @@ spec:
                   - name
                   type: object
                 type: array
+              csiSecrets:
+                description: |-
+                  CSISecrets mounts external providers read-only in subscription jobs only.
+                  The job template must select its own runtime service account.
+                items:
+                  description: |-
+                    CSISecretMount references an external, namespace-local SecretProviderClass.
+                    Credentials and identity are never copied from the operator's own pod.
+                  properties:
+                    driver:
+                      default: secrets-store-gke.csi.k8s.io
+                      description: Driver defaults to the GKE Secret Manager CSI driver.
+                      enum:
+                      - secrets-store-gke.csi.k8s.io
+                      - secrets-store.csi.k8s.io
+                      type: string
+                    mountPath:
+                      description: MountPath is an absolute path in the subscription
+                        runner.
+                      pattern: ^/[^\x00]+$
+                      type: string
+                    name:
+                      description: Name is the job-local volume name.
+                      maxLength: 63
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                      x-kubernetes-validations:
+                      - message: reserved template volume name
+                        rule: self != 'config' && self != 'files' && self != 'gcp-service-account'
+                    secretProviderClass:
+                      description: SecretProviderClass must already exist in the job's
+                        namespace.
+                      minLength: 1
+                      type: string
+                  required:
+                  - mountPath
+                  - name
+                  - secretProviderClass
+                  type: object
+                maxItems: 16
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
               env:
                 description: Env is a list of environment variables to set in the
                   container
@@ -1018,7 +1062,9 @@ spec:
                           description: Selects a key of a ConfigMap.
                           properties:
                             key:
-                              description: The key to select.
+                              description: |-
+                                The key to select from the ConfigMap's Data field.
+                                Keys in the BinaryData field are not currently propagated to container env vars.
                               type: string
                             name:
                               default: ""
