@@ -29,3 +29,9 @@ cluster resources, so administrator rollback/history policy must exclude such
 revisions. Do not delete/recreate, force-adopt, or prune these resources to transfer
 ownership. Deployment identity and infrastructure operation documentation belongs
 in the infrastructure root.
+
+Kubernetes service accounts remain application-owned. A retained binding can grant
+permissions again if its subject name is reused. Before permanently retiring the
+application or reassigning that KSA name, the administrator must revoke/retire the
+bootstrap binding through infrastructure review. Do not grant application CI
+cluster deletion rights or silently retain application KSAs as bootstrap objects.

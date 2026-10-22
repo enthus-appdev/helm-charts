@@ -14,7 +14,7 @@ def render(chart, *settings):
                "--namespace", "runtime-test"]
     for setting in settings:
         command.extend(["--set", setting])
-    return [obj for obj in yaml.safe_load_all(subprocess.check_output(command, text=True)) if obj]
+    return [obj for obj in yaml.safe_load_all(subprocess.check_output(command, text=True, stderr=subprocess.STDOUT, timeout=60)) if obj]
 
 
 class BootstrapOwnership(unittest.TestCase):
@@ -51,6 +51,26 @@ class BootstrapOwnership(unittest.TestCase):
         self.assertEqual(len(cluster), 4)
         for obj in cluster:
             self.assertEqual(obj["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
+
+    def test_keep_cannot_stage_without_rendering_rbac(self):
+        for chart in ["api-manager-deployment", "negsoft-operator"]:
+            with self.subTest(chart=chart):
+                objects = render(chart, "rbac.create=false", "rbac.keep=true")
+                self.assertFalse(any(obj["kind"] in {"ClusterRole", "ClusterRoleBinding"} for obj in objects))
+
+    def test_crd_retention_is_independent_of_rbac(self):
+        objects = render("negsoft-operator", "rbac.create=false", "crds.install=true")
+        cluster = [obj for obj in objects if obj["kind"] in CLUSTER_KINDS]
+        self.assertEqual(len(cluster), 1)
+        self.assertEqual(cluster[0]["kind"], "CustomResourceDefinition")
+        self.assertEqual(cluster[0]["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
+
+    def test_manager_rejects_invalid_runtime_identity(self):
+        for name in ["bad:name", "bad/name", "Uppercase", "bad\\nsubjects:", "x" * 254]:
+            with self.subTest(name=name):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render("api-manager-deployment", f"serviceAccount.name={name}")
+                self.assertIn("serviceAccount.name must be a Kubernetes DNS subdomain string", error.exception.output)
 
     def test_binding_uses_runtime_service_account(self):
         for chart in ["api-manager-deployment", "negsoft-operator"]:

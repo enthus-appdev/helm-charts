@@ -54,6 +54,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "api-manager-deployment.serviceAccountName" -}}
+{{- with .Values.serviceAccount.name }}
+{{- if not (kindIs "string" .) }}
+{{- fail "serviceAccount.name must be a Kubernetes DNS subdomain string" }}
+{{- end }}
+{{- if or (gt (len .) 253) (not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" .)) }}
+{{- fail "serviceAccount.name must be a Kubernetes DNS subdomain string" }}
+{{- end }}
+{{- end }}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "api-manager-deployment.fullname" .) .Values.serviceAccount.name }}
 {{- else }}

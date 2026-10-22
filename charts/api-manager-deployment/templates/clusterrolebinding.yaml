@@ -15,6 +15,6 @@ roleRef:
   name: {{ include "api-manager-deployment.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "api-manager-deployment.serviceAccountName" . }}
+    name: {{ include "api-manager-deployment.serviceAccountName" . | quote }}
     namespace: {{ .Release.Namespace }}
 {{- end -}}

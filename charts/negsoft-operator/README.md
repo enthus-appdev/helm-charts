@@ -36,3 +36,9 @@ policy must prevent old application revisions reclaiming these objects. Never
 use deletion/recreation, force-adoption or pruning as a shortcut. Deployment
 identity and infrastructure operation documentation belongs in the infrastructure
 root; this chart change does not claim live adoption or runtime verification.
+
+Kubernetes service accounts remain application-owned. A retained binding can grant
+permissions again if its subject name is reused. Before permanently retiring the
+application or reassigning that KSA name, the administrator must revoke/retire the
+bootstrap binding through infrastructure review. Do not grant application CI
+cluster deletion rights or silently retain application KSAs as bootstrap objects.
