@@ -23,10 +23,16 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
+  # Must be a string; quote numeric names in YAML or use --set-string.
   name: ""
 
 rbac:
+  # Disable only after administrator bootstrap has retained and taken responsibility
+  # for these resources; removing unretained objects from a release can delete them.
   create: true
+  # Stage with create=true in an administrator upgrade before setting create=false.
+  # Verify keep in the stored release manifest, not just on the live objects.
+  keep: false
 
 podAnnotations: {}
 podLabels: {}
@@ -100,7 +106,21 @@ tolerations: []
 
 affinity: {}
 
+# Legacy Secret and automatic secretKeyRef environment. Disable only when env
+# supplies all runtime configuration and file paths; old Secret removal is admin-owned.
 secret:
+  # Boolean only; do not use --set-string for create.
+  create: true
+  # Administrator-only conventional retention staging while create=true and old
+  # values remain rendered. This creates another Helm release record containing
+  # existing credential material and REQUIRES EXPLICIT OWNER APPROVAL.
+  # Verify keep in the PREVIOUS stored release manifest
+  # before a later create=false upgrade. Live-only keep or one-step omission is
+  # insufficient. No lookup/copy of legacy data; admin must approve this sequence
+  # or a separately approved CSI-first transition/drain, followed by intentional
+  # administrator prune only after ALL old consumers/templates are gone. Neither
+  # path is authorized by this flag; no worker payload reads/renders/applies.
+  keep: false
   mssqlHostname: ""
   mssqlPort: "1433"
   mssqlDatabase: ""
@@ -121,6 +141,28 @@ signatureVolume:
 jobServiceAccountName: ""
 
 cronjobPrefix: ""
+
+# Additional controller environment; never copied to generated subscription jobs.
+# With secret.create=false, supply all MSSQL/Redis configuration here.
+# Names must be unique: do not repeat CRONJOB_PREFIX or legacy env names when
+# secret.create=true. Quote env value scalars (for example value: "1533").
+env: []
+
+# Controller-only read-only CSI mounts. No Kubernetes Secret synchronization.
+# Existing runtime serviceAccount.name/annotations select the mount identity.
+# Set boolean create:false (not --set-string) for an administrator-provisioned SPC.
+# Each created SPC name must be unique. Volume names/mount paths must not collide
+# with config or additional volumes/volumeMounts. Bootstrap must authorize the
+# selected runtime KSA for these secrets; annotations alone are not authorization.
+csiSecrets: []
+  # - name: operator-secrets
+  #   mountPath: /var/run/operator-secrets
+  #   secretProviderClass: operator-runtime
+  #   create: false
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: projects/project/secrets/name/versions/latest
+  #       path: mssql-password
 
 crds:
   # Install the NegSoftSubscription CRD with the chart. Disable if CRDs are

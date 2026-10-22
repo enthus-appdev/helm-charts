@@ -105,6 +105,8 @@ configMaps: []
   #   readOnly: true
   #   optional: false
 
+# Set create: false per entry to reference an administrator-provisioned SPC.
+# Removing a previously chart-managed SPC needs an administrator hand-over first.
 csiSecrets: []
   # - name: my-secret
   #   mountPath: /var/run/secret/my-secret
