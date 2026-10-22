@@ -43,7 +43,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            {{- if .Values.secret.create }}
+            {{- if or (not (hasKey .Values.secret "create")) .Values.secret.create }}
             - name: MSSQL_HOSTNAME
               valueFrom:
                 secretKeyRef:

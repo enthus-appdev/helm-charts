@@ -132,6 +132,14 @@ class CSIInterfaces(unittest.TestCase):
                     render("negsoft-operator", {"csiSecrets": [entry]})
                 self.assertIn(f"csiSecrets.{field} is required", error.exception.stderr)
 
+    def test_operator_missing_new_flags_preserve_legacy_defaults(self):
+        objects = render("negsoft-operator", {"secret": {"create": None, "keep": None}})
+        secret = next(obj for obj in objects if obj["kind"] == "Secret")
+        self.assertNotIn("helm.sh/resource-policy", secret["metadata"].get("annotations", {}))
+        controller = next(obj for obj in objects if obj["kind"] == "Deployment")
+        env = controller["spec"]["template"]["spec"]["containers"][0]["env"]
+        self.assertIn("MSSQL_PASSWORD", [item["name"] for item in env])
+
     def test_operator_keep_requires_boolean(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render("negsoft-operator", {"secret": {"keep": "false"}})
