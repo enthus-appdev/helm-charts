@@ -102,8 +102,8 @@ spec:
               mountPath: /config
               readOnly: true
           {{- range .Values.csiSecrets }}
-            - name: {{ .name | quote }}
-              mountPath: {{ .mountPath | quote }}
+            - name: {{ required "csiSecrets.name is required" .name | quote }}
+              mountPath: {{ required "csiSecrets.mountPath is required" .mountPath | quote }}
               readOnly: true
           {{- end }}
           {{- with .Values.volumeMounts }}
@@ -114,7 +114,7 @@ spec:
           configMap:
             name: {{ include "negsoft-operator.fullname" . }}
       {{- range .Values.csiSecrets }}
-        - name: {{ .name | quote }}
+        - name: {{ required "csiSecrets.name is required" .name | quote }}
           csi:
             driver: {{ .driver | default "secrets-store-gke.csi.k8s.io" }}
             readOnly: true

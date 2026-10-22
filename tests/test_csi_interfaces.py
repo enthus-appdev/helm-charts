@@ -17,8 +17,10 @@ def render(chart, values):
     with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml") as file:
         yaml.safe_dump(values, file)
         file.flush()
-        output = subprocess.check_output(["helm", "template", "runtime-test", str(ROOT / "charts" / chart),
-                                          "--namespace", "test-ns", "-f", file.name], text=True, stderr=subprocess.STDOUT)
+        result = subprocess.run(["helm", "template", "runtime-test", str(ROOT / "charts" / chart),
+                                 "--namespace", "test-ns", "-f", file.name],
+                                text=True, capture_output=True, check=True, timeout=60)
+        output = result.stdout
     return [obj for obj in yaml.safe_load_all(output) if obj]
 
 
@@ -93,7 +95,7 @@ class CSIInterfaces(unittest.TestCase):
     def test_manager_csi_requires_explicit_job_identity(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render("api-manager-deployment", {"csiSecrets": [CSI]})
-        self.assertIn("job.serviceAccountName is required", error.exception.output)
+        self.assertIn("job.serviceAccountName is required", error.exception.stderr)
 
     def test_create_flags_reject_string_false(self):
         for chart in CHARTS:
@@ -101,10 +103,10 @@ class CSIInterfaces(unittest.TestCase):
                 with self.assertRaises(subprocess.CalledProcessError) as error:
                     render(chart, {"csiSecrets": [dict(CSI, create="false")],
                                    "job": {"serviceAccountName": "runtime"}})
-                self.assertIn("csiSecrets.create must be a boolean", error.exception.output)
+                self.assertIn("csiSecrets.create must be a boolean", error.exception.stderr)
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render("negsoft-operator", {"secret": {"create": "false"}})
-        self.assertIn("secret.create must be a boolean", error.exception.output)
+        self.assertIn("secret.create must be a boolean", error.exception.stderr)
 
     def test_operator_legacy_secret_keep_is_annotation_only(self):
         default = next(obj for obj in render("negsoft-operator", {}) if obj["kind"] == "Secret")
@@ -120,7 +122,48 @@ class CSIInterfaces(unittest.TestCase):
     def test_operator_csi_requires_provider_reference(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render("negsoft-operator", {"csiSecrets": [{"name": "files", "mountPath": "/runtime"}]})
-        self.assertIn("csiSecrets.secretProviderClass is required", error.exception.output)
+        self.assertIn("csiSecrets.secretProviderClass is required", error.exception.stderr)
+
+    def test_operator_csi_required_mount_fields(self):
+        for entry, field in [({"secretProviderClass": "spc"}, "name"),
+                             ({"name": "files", "secretProviderClass": "spc"}, "mountPath")]:
+            with self.subTest(field=field):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render("negsoft-operator", {"csiSecrets": [entry]})
+                self.assertIn(f"csiSecrets.{field} is required", error.exception.stderr)
+
+    def test_operator_keep_requires_boolean(self):
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render("negsoft-operator", {"secret": {"keep": "false"}})
+        self.assertIn("secret.keep must be a boolean", error.exception.stderr)
+
+    def test_operator_env_with_legacy_secret(self):
+        objects = render("negsoft-operator", {"env": [{"name": "EXTRA", "value": "x"}]})
+        controller = next(obj for obj in objects if obj["kind"] == "Deployment")
+        env = controller["spec"]["template"]["spec"]["containers"][0]["env"]
+        self.assertIn({"name": "EXTRA", "value": "x"}, env)
+        for name in ["MSSQL_PASSWORD", "REDIS_PASSWORD"]:
+            self.assertIn("secretKeyRef", next(item for item in env if item["name"] == name)["valueFrom"])
+
+    def test_manager_signature_mount_preserves_explicit_job_identity(self):
+        values = {"signatureVolume": {"enabled": True, "bucketName": "synthetic-signatures"}}
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render("api-manager-deployment", values)
+        self.assertIn("job.serviceAccountName is required", error.exception.stderr)
+        values["job"] = {"serviceAccountName": "signature-worker"}
+        objects = render("api-manager-deployment", values)
+        config = next(obj for obj in objects if obj["kind"] == "ConfigMap")
+        job = yaml.safe_load(config["data"]["template_job.yaml"])
+        self.assertEqual(job["spec"]["template"]["spec"]["serviceAccountName"], "signature-worker")
+
+    def test_operator_custom_driver_and_provider_are_preserved(self):
+        entry = dict(CSI, create=True, driver="secrets-store.csi.k8s.io", provider="custom-provider")
+        objects = render("negsoft-operator", {"csiSecrets": [entry]})
+        controller = next(obj for obj in objects if obj["kind"] == "Deployment")
+        volume = next(item for item in controller["spec"]["template"]["spec"]["volumes"] if item["name"] == CSI["name"])
+        self.assertEqual(volume["csi"]["driver"], entry["driver"])
+        spc = next(obj for obj in objects if obj["kind"] == "SecretProviderClass")
+        self.assertEqual(spc["spec"]["provider"], entry["provider"])
 
     def test_operator_prefix_is_string(self):
         objects = render("negsoft-operator", {"cronjobPrefix": "123", "secret": {"create": False}})
