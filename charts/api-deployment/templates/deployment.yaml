@@ -1,3 +1,6 @@
+{{- if hasKey .Values "grpcProbes" -}}
+{{- fail "grpcProbes has been removed; configure livenessProbe.grpc and readinessProbe.grpc instead" -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,42 +60,8 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          {{- if .Values.grpcProbes.enabled }}
-          {{- include "api-deployment.grpcProbes.validate" . }}
-            - name: grpc-health
-              containerPort: {{ int .Values.grpcProbes.port }}
-              protocol: TCP
-          livenessProbe:
-            grpc:
-              port: {{ int .Values.grpcProbes.port }}
-              {{- with .Values.grpcProbes.service }}
-              service: {{ . | quote }}
-              {{- end }}
-            {{- with .Values.grpcProbes.liveness }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          readinessProbe:
-            grpc:
-              port: {{ int .Values.grpcProbes.port }}
-              {{- with .Values.grpcProbes.service }}
-              service: {{ . | quote }}
-              {{- end }}
-            {{- with .Values.grpcProbes.readiness }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
-          {{- end }}
-          {{- if .Values.livenessProbe.enabled }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          {{- end }}
-          {{- if .Values.readinessProbe.enabled }}
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          {{- end }}
+          {{- include "api-deployment.probe" (dict "name" "livenessProbe" "probe" .Values.livenessProbe) | nindent 10 }}
+          {{- include "api-deployment.probe" (dict "name" "readinessProbe" "probe" .Values.readinessProbe) | nindent 10 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
