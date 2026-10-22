@@ -42,8 +42,8 @@ spec:
   {{- with .Values.csiSecrets }}
   csiSecrets:
     {{- range . }}
-    - name: {{ .name | quote }}
-      mountPath: {{ .mountPath | quote }}
+    - name: {{ required "csiSecrets.name is required" .name | quote }}
+      mountPath: {{ required "csiSecrets.mountPath is required" .mountPath | quote }}
       secretProviderClass: {{ required "csiSecrets.secretProviderClass is required" .secretProviderClass | quote }}
       {{- with .driver }}
       driver: {{ . | quote }}

@@ -58,6 +58,32 @@ class SubscriptionCSI(unittest.TestCase):
         self.assertNotIn("serviceAccountName", subscription["spec"])
         self.assertEqual(next(obj for obj in objects if obj["kind"] == "ServiceAccount")["metadata"]["name"], "declared-worker")
 
+    def test_default_provider_and_mixed_spc_ownership(self):
+        source = {"resourceName": "projects/test/secrets/sql/versions/latest", "path": "password"}
+        owned = dict(MOUNT, name="owned", secretProviderClass="owned-provider", secrets=[source])
+        external = dict(MOUNT, name="external", secretProviderClass="shared-provider", create=False)
+        objects = render({"csiSecrets": [owned, external]})
+        subscription = next(obj for obj in objects if obj["kind"] == "NegSoftSubscription")
+        self.assertEqual([item["name"] for item in subscription["spec"]["csiSecrets"]], ["owned", "external"])
+        spcs = [obj for obj in objects if obj["kind"] == "SecretProviderClass"]
+        self.assertEqual(len(spcs), 1)
+        self.assertEqual(spcs[0]["metadata"]["name"], "owned-provider")
+        self.assertEqual(spcs[0]["spec"]["provider"], "gke")
+        self.assertEqual(yaml.safe_load(spcs[0]["spec"]["parameters"]["secrets"]), [source])
+
+    def test_missing_mount_fields_fail_before_invalid_cr_output(self):
+        for entry, field in [({"secretProviderClass": "spc"}, "name"),
+                             ({"name": "volume", "secretProviderClass": "spc"}, "mountPath")]:
+            with self.subTest(field=field):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render({"csiSecrets": [entry]})
+                self.assertIn(f"csiSecrets.{field} is required", error.exception.output)
+
+    def test_credential_retention_flag_requires_boolean(self):
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render({"credentialsKeep": "false", "credentials": {"synthetic": "fixture-only"}})
+        self.assertIn("credentialsKeep must be a boolean", error.exception.output)
+
     def test_create_string_false_rejected(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render({"csiSecrets": [dict(MOUNT, create="false")]})
