@@ -2,7 +2,7 @@ apiVersion: v2
 name: api-job-cronjob
 description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
 type: application
-version: 0.7.0
+version: 0.7.1
 appVersion: "1.0.0"
 maintainers:
   - name: "enthus GmbH"
