@@ -20,9 +20,6 @@ spec:
             {{- end }}
             {{- if .Values.signatureVolume.enabled }}
             gke-gcsfuse/volumes: "true"
-            {{- with .Values.signatureVolume.sidecarAnnotations }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
             {{- end }}
           {{- end }}
           labels:

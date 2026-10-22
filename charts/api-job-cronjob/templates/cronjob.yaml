@@ -41,9 +41,6 @@ spec:
             {{- end }}
             {{- if $signatureVolume }}
             gke-gcsfuse/volumes: "true"
-            {{- with $.Values.signatureVolume.sidecarAnnotations }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
             {{- end }}
         {{- end }}
           labels:

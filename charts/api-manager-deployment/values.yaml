@@ -152,13 +152,6 @@ signatureVolume:
   bucketName: ""
   mountPath: /mnt/signatures
   mountOptions: implicit-dirs
-  # GCS FUSE sidecar resources. The driver default (250m CPU, 256Mi memory) is
-  # far above what the read-only signature mount uses; "0" leaves a limit unset.
-  sidecarAnnotations:
-    gke-gcsfuse/cpu-request: 10m
-    gke-gcsfuse/cpu-limit: "0"
-    gke-gcsfuse/memory-request: 128Mi
-    gke-gcsfuse/memory-limit: "0"
 
 volume:
   data:
