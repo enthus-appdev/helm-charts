@@ -363,6 +363,18 @@ entries:
   api-subscription:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-22T21:22:59.69788521Z"
+    description: Deployment chart for the NegSoft subscription API workload
+    digest: af8432119e3862f34037566104cb448f2739c08dd9971f2d6baa08a9a9dd3ae2
+    maintainers:
+    - name: enthus-appdev
+    name: api-subscription
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-subscription-0.6.0/api-subscription-0.6.0.tgz
+    version: 0.6.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-10-21T17:39:02.288985261Z"
     description: Deployment chart for the NegSoft subscription API workload
     digest: 434af12487f25a1f53913a15ff3ffa784d8da8639e56a91ba2ceeaf2f0092004
@@ -547,6 +559,16 @@ entries:
     - https://github.com/enthus-appdev/helm-charts/releases/download/healthcheck-0.1.0/healthcheck-0.1.0.tgz
     version: 0.1.0
   negsoft-operator:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-10-22T21:22:59.880121673Z"
+    description: Kubernetes operator for managing NegSoft user subscriptions
+    digest: 3802b0008a39434747e37140319d2dd799096ad5e15d7ca2c13704c50aa5cb8a
+    name: negsoft-operator
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/negsoft-operator-0.9.0/negsoft-operator-0.9.0.tgz
+    version: 0.9.0
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2026-10-22T21:20:33.204344163Z"
@@ -748,4 +770,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-10-22T21:20:33.204495626Z"
+generated: "2026-10-22T21:22:59.880200963Z"
