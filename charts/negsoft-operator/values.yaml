@@ -103,6 +103,7 @@ affinity: {}
 # Legacy Secret and automatic secretKeyRef environment. Disable only when env
 # supplies all runtime configuration and file paths; old Secret removal is admin-owned.
 secret:
+  # Boolean only; do not use --set-string for create.
   create: true
   mssqlHostname: ""
   mssqlPort: "1433"
@@ -127,11 +128,16 @@ cronjobPrefix: ""
 
 # Additional controller environment; never copied to generated subscription jobs.
 # With secret.create=false, supply all MSSQL/Redis configuration here.
+# Names must be unique: do not repeat CRONJOB_PREFIX or legacy env names when
+# secret.create=true. Quote env value scalars (for example value: "1533").
 env: []
 
 # Controller-only read-only CSI mounts. No Kubernetes Secret synchronization.
 # Existing runtime serviceAccount.name/annotations select the mount identity.
-# Set create:false to reference an administrator-provisioned namespace SPC.
+# Set boolean create:false (not --set-string) for an administrator-provisioned SPC.
+# Each created SPC name must be unique. Volume names/mount paths must not collide
+# with config or additional volumes/volumeMounts. Bootstrap must authorize the
+# selected runtime KSA for these secrets; annotations alone are not authorization.
 csiSecrets: []
   # - name: operator-secrets
   #   mountPath: /var/run/operator-secrets

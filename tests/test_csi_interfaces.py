@@ -18,7 +18,7 @@ def render(chart, values):
         yaml.safe_dump(values, file)
         file.flush()
         output = subprocess.check_output(["helm", "template", "runtime-test", str(ROOT / "charts" / chart),
-                                          "--namespace", "test-ns", "-f", file.name], text=True)
+                                          "--namespace", "test-ns", "-f", file.name], text=True, stderr=subprocess.STDOUT)
     return [obj for obj in yaml.safe_load_all(output) if obj]
 
 
@@ -43,7 +43,7 @@ class CSIInterfaces(unittest.TestCase):
                 objects = render(chart, values)
                 self.assertFalse(any(obj["kind"] == "SecretProviderClass" for obj in objects))
                 specs = list(podspecs(objects))
-                self.assertTrue(specs)
+                self.assertEqual(len(specs), 2 if chart == "api-manager-deployment" else 1)
                 for spec in specs:
                     volume = next(volume for volume in spec["volumes"] if volume["name"] == CSI["name"])
                     self.assertEqual(volume["csi"], {"driver": "secrets-store-gke.csi.k8s.io", "readOnly": True,
@@ -83,6 +83,22 @@ class CSIInterfaces(unittest.TestCase):
         spec = generated["spec"]["jobTemplate"]["spec"]["template"]["spec"]
         self.assertFalse(any(volume["name"] == CSI["name"] for volume in spec["volumes"]))
         self.assertNotIn("env", spec["containers"][0])
+
+    def test_manager_csi_requires_explicit_job_identity(self):
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render("api-manager-deployment", {"csiSecrets": [CSI]})
+        self.assertIn("job.serviceAccountName is required", error.exception.output)
+
+    def test_create_flags_reject_string_false(self):
+        for chart in CHARTS:
+            with self.subTest(chart=chart):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render(chart, {"csiSecrets": [dict(CSI, create="false")],
+                                   "job": {"serviceAccountName": "runtime"}})
+                self.assertIn("csiSecrets.create must be a boolean", error.exception.output)
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render("negsoft-operator", {"secret": {"create": "false"}})
+        self.assertIn("secret.create must be a boolean", error.exception.output)
 
     def test_operator_legacy_defaults_remain(self):
         objects = render("negsoft-operator", {})
