@@ -80,15 +80,35 @@ strip-prefixed service after its path prefix is gone. Single-sourced so the two 
 {{- end -}}
 {{- end -}}
 
-{{- define "api-deployment.grpcProbes.validate" -}}
-{{- if .Values.grpcProbes.enabled -}}
-{{- $g := .Values.grpcProbes -}}
-{{- if .Values.livenessProbe.enabled }}{{ fail "grpcProbes.enabled replaces the HTTP probes: set livenessProbe.enabled to false" }}{{- end -}}
-{{- if .Values.readinessProbe.enabled }}{{ fail "grpcProbes.enabled replaces the HTTP probes: set readinessProbe.enabled to false" }}{{- end -}}
-{{- if not (or (kindIs "float64" $g.port) (kindIs "int64" $g.port) (kindIs "int" $g.port)) }}{{ fail "grpcProbes.port must be a port number (gRPC probes take no named port)" }}{{- end -}}
-{{- $port := int $g.port -}}
-{{- if or (lt $port 1) (gt $port 65535) }}{{ fail "grpcProbes.port must be between 1 and 65535" }}{{- end -}}
-{{- if eq $port 8080 }}{{ fail "grpcProbes.port must not be 8080, the http container port; use the plaintext health port" }}{{- end -}}
-{{- if or (hasKey ($g.liveness | default dict) "grpc") (hasKey ($g.readiness | default dict) "grpc") }}{{ fail "grpcProbes.liveness and grpcProbes.readiness take probe timing fields only; set the port with grpcProbes.port" }}{{- end -}}
+{{/*
+Render a Kubernetes probe, retaining the historical HTTP default when no handler
+is specified. Keep enabled chart-only; all remaining fields are native probe fields.
+*/}}
+{{- define "api-deployment.probe" -}}
+{{- $probe := omit .probe "enabled" -}}
+{{- if .probe.enabled -}}
+{{- $handlers := 0 -}}
+{{- range $handler := list "httpGet" "grpc" "tcpSocket" "exec" -}}
+{{- if hasKey $probe $handler -}}
+{{- $handlers = add1 $handlers -}}
+{{- end -}}
+{{- end -}}
+{{- if gt (int $handlers) 1 -}}
+{{- fail (printf "%s must specify exactly one probe handler" .name) -}}
+{{- end -}}
+{{- if eq (int $handlers) 0 -}}
+{{- $_ := set $probe "httpGet" (dict "path" "/" "port" "http") -}}
+{{- end -}}
+{{- if hasKey $probe "grpc" -}}
+{{- $port := $probe.grpc.port -}}
+{{- if not (or (kindIs "float64" $port) (kindIs "int64" $port) (kindIs "int" $port)) -}}
+{{- fail (printf "%s.grpc.port must be an integer between 1 and 65535" .name) -}}
+{{- end -}}
+{{- if or (lt (float64 $port) 1.0) (gt (float64 $port) 65535.0) (ne (float64 $port) (float64 (int $port))) -}}
+{{- fail (printf "%s.grpc.port must be an integer between 1 and 65535" .name) -}}
+{{- end -}}
+{{- end -}}
+{{ .name }}:
+{{- toYaml $probe | nindent 2 }}
 {{- end -}}
 {{- end -}}

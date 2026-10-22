@@ -187,20 +187,12 @@ volume:
     volumeClaim: ""
 
 # Customize liveness and readiness probe values.
+# Native Kubernetes probe fields, plus enabled. With no handler, defaults to
+# httpGet: {path: /, port: http}. Specify one of httpGet, grpc, tcpSocket or exec.
+# gRPC requires a plaintext grpc.health.v1 endpoint and a numeric port.
+# Example: {enabled: true, grpc: {port: 8080, service: readiness}, periodSeconds: 5}
 readinessProbe:
   enabled: true
 
 livenessProbe:
   enabled: true
-
-# Native gRPC health probes (grpc.health.v1) for a workload whose port 8080 serves
-# gRPC rather than HTTP. They replace the HTTP probes above, which must then be
-# disabled. The kubelet probes in plaintext, so the port must serve the health
-# service without TLS.
-grpcProbes:
-  enabled: false
-  port: 8081      # a number: gRPC probes take no named port
-  service: ""     # health service name; "" checks the whole server
-  # Probe timing fields only (no grpc key), e.g. {initialDelaySeconds: 30, periodSeconds: 10}
-  liveness: {}
-  readiness: {}
