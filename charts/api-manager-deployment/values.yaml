@@ -25,6 +25,7 @@ serviceAccount:
   # default KSA. Set an explicit runtime KSA to avoid granting it Jobs permissions.
   # Existing releases with custom/external KSAs need administrator review of the
   # old binding subject before upgrading: it previously always used fullname.
+  # Must be a string; quote numeric names in YAML or use --set-string.
   name: ""
 
 podAnnotations: {}

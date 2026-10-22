@@ -15,7 +15,7 @@ roleRef:
   name: {{ include "negsoft-operator.fullname" . }}-update-cronjobs
 subjects:
   - kind: ServiceAccount
-    name: {{ include "negsoft-operator.serviceAccountName" . }}
+    name: {{ include "negsoft-operator.serviceAccountName" . | quote }}
     namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -34,6 +34,6 @@ roleRef:
   name: {{ include "negsoft-operator.fullname" . }}-read-subscriptions
 subjects:
   - kind: ServiceAccount
-    name: {{ include "negsoft-operator.serviceAccountName" . }}
+    name: {{ include "negsoft-operator.serviceAccountName" . | quote }}
     namespace: {{ .Release.Namespace }}
 {{- end -}}

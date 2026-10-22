@@ -54,6 +54,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "negsoft-operator.serviceAccountName" -}}
+{{- if and (hasKey .Values.serviceAccount "name") (not (kindIs "string" .Values.serviceAccount.name)) }}
+{{- fail "serviceAccount.name must be a Kubernetes DNS subdomain string" }}
+{{- end }}
+{{- with .Values.serviceAccount.name }}
+{{- if or (gt (len .) 253) (not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" .)) }}
+{{- fail "serviceAccount.name must be a Kubernetes DNS subdomain string" }}
+{{- end }}
+{{- end }}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "negsoft-operator.fullname" .) .Values.serviceAccount.name }}
 {{- else }}

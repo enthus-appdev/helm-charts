@@ -9,12 +9,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 CLUSTER_KINDS = {"ClusterRole", "ClusterRoleBinding", "CustomResourceDefinition"}
 
 
-def render(chart, *settings):
+def render(chart, *settings, string_settings=()):
     command = ["helm", "template", "ownership-test", str(ROOT / "charts" / chart),
                "--namespace", "runtime-test"]
     for setting in settings:
         command.extend(["--set", setting])
-    return [obj for obj in yaml.safe_load_all(subprocess.check_output(command, text=True, stderr=subprocess.STDOUT, timeout=60)) if obj]
+    for setting in string_settings:
+        command.extend(["--set-string", setting])
+    result = subprocess.run(command, text=True, capture_output=True, check=True, timeout=60)
+    return [obj for obj in yaml.safe_load_all(result.stdout) if obj]
 
 
 class BootstrapOwnership(unittest.TestCase):
@@ -65,12 +68,24 @@ class BootstrapOwnership(unittest.TestCase):
         self.assertEqual(cluster[0]["kind"], "CustomResourceDefinition")
         self.assertEqual(cluster[0]["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
 
-    def test_manager_rejects_invalid_runtime_identity(self):
-        for name in ["bad:name", "bad/name", "Uppercase", "bad\\nsubjects:", "x" * 254]:
-            with self.subTest(name=name):
-                with self.assertRaises(subprocess.CalledProcessError) as error:
-                    render("api-manager-deployment", f"serviceAccount.name={name}")
-                self.assertIn("serviceAccount.name must be a Kubernetes DNS subdomain string", error.exception.output)
+    def test_rejects_invalid_runtime_identity(self):
+        for chart in ["api-manager-deployment", "negsoft-operator"]:
+            for name in ["bad:name", "bad/name", "Uppercase", "bad\nsubjects:", "x" * 254,
+                         "false", "0", "123"]:
+                with self.subTest(chart=chart, name=name):
+                    with self.assertRaises(subprocess.CalledProcessError) as error:
+                        render(chart, f"serviceAccount.name={name}")
+                    self.assertIn("serviceAccount.name must be a Kubernetes DNS subdomain string", error.exception.stderr)
+
+    def test_valid_dotted_and_boundary_runtime_identity(self):
+        for chart in ["api-manager-deployment", "negsoft-operator"]:
+            for name in ["runtime.sa.example", ("a" * 63 + ".") * 3 + "b" * 61, "a" * 64, "123"]:
+                with self.subTest(chart=chart, name=name):
+                    objects = render(chart, string_settings=[f"serviceAccount.name={name}"])
+                    bindings = [obj for obj in objects if obj["kind"] == "ClusterRoleBinding"]
+                    self.assertEqual(len(bindings), 1 if chart == "api-manager-deployment" else 2)
+                    for binding in bindings:
+                        self.assertEqual(binding["subjects"][0]["name"], name)
 
     def test_binding_uses_runtime_service_account(self):
         for chart in ["api-manager-deployment", "negsoft-operator"]:
