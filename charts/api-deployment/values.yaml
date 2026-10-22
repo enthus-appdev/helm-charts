@@ -201,5 +201,6 @@ grpcProbes:
   enabled: false
   port: 8081      # a number: gRPC probes take no named port
   service: ""     # health service name; "" checks the whole server
-  liveness: {}    # extra probe fields, e.g. {periodSeconds: 10, failureThreshold: 3}
+  # Probe timing fields only (no grpc key), e.g. {initialDelaySeconds: 30, periodSeconds: 10}
+  liveness: {}
   readiness: {}

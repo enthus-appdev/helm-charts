@@ -61,15 +61,13 @@ spec:
               containerPort: 8080
               protocol: TCP
           {{- if .Values.grpcProbes.enabled }}
-          {{- if or .Values.livenessProbe.enabled .Values.readinessProbe.enabled }}
-          {{- fail "grpcProbes.enabled replaces the HTTP probes: set livenessProbe.enabled and readinessProbe.enabled to false" }}
-          {{- end }}
+          {{- include "api-deployment.grpcProbes.validate" . }}
             - name: grpc-health
-              containerPort: {{ .Values.grpcProbes.port }}
+              containerPort: {{ int .Values.grpcProbes.port }}
               protocol: TCP
           livenessProbe:
             grpc:
-              port: {{ .Values.grpcProbes.port }}
+              port: {{ int .Values.grpcProbes.port }}
               {{- with .Values.grpcProbes.service }}
               service: {{ . | quote }}
               {{- end }}
@@ -78,7 +76,7 @@ spec:
             {{- end }}
           readinessProbe:
             grpc:
-              port: {{ .Values.grpcProbes.port }}
+              port: {{ int .Values.grpcProbes.port }}
               {{- with .Values.grpcProbes.service }}
               service: {{ . | quote }}
               {{- end }}
