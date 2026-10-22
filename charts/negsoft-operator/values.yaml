@@ -100,7 +100,10 @@ tolerations: []
 
 affinity: {}
 
+# Legacy Secret and automatic secretKeyRef environment. Disable only when env
+# supplies all runtime configuration and file paths; old Secret removal is admin-owned.
 secret:
+  create: true
   mssqlHostname: ""
   mssqlPort: "1433"
   mssqlDatabase: ""
@@ -121,6 +124,23 @@ signatureVolume:
 jobServiceAccountName: ""
 
 cronjobPrefix: ""
+
+# Additional controller environment; never copied to generated subscription jobs.
+# With secret.create=false, supply all MSSQL/Redis configuration here.
+env: []
+
+# Controller-only read-only CSI mounts. No Kubernetes Secret synchronization.
+# Existing runtime serviceAccount.name/annotations select the mount identity.
+# Set create:false to reference an administrator-provisioned namespace SPC.
+csiSecrets: []
+  # - name: operator-secrets
+  #   mountPath: /var/run/operator-secrets
+  #   secretProviderClass: operator-runtime
+  #   create: false
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: projects/project/secrets/name/versions/latest
+  #       path: mssql-password
 
 crds:
   # Install the NegSoftSubscription CRD with the chart. Disable if CRDs are

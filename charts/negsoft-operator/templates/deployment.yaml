@@ -43,6 +43,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            {{- if .Values.secret.create }}
             - name: MSSQL_HOSTNAME
               valueFrom:
                 secretKeyRef:
@@ -90,12 +91,21 @@ spec:
                 secretKeyRef:
                   name: {{ include "negsoft-operator.fullname" . }}-secret
                   key: redisPassword
+            {{- end }}
             - name: CRONJOB_PREFIX
-              value: {{ .Values.cronjobPrefix }}
+              value: {{ .Values.cronjobPrefix | quote }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /config
               readOnly: true
+          {{- range .Values.csiSecrets }}
+            - name: {{ .name | quote }}
+              mountPath: {{ .mountPath | quote }}
+              readOnly: true
+          {{- end }}
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -103,6 +113,14 @@ spec:
         - name: config
           configMap:
             name: {{ include "negsoft-operator.fullname" . }}
+      {{- range .Values.csiSecrets }}
+        - name: {{ .name | quote }}
+          csi:
+            driver: {{ .driver | default "secrets-store-gke.csi.k8s.io" }}
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ required "csiSecrets.secretProviderClass is required" .secretProviderClass | quote }}
+      {{- end }}
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
