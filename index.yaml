@@ -3,6 +3,18 @@ entries:
   api-deployment:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-22T04:53:00.754794914Z"
+    description: Deployment chart for the NegSoft API service
+    digest: a0f44f9181d5752ecc24d47db3ec71cdb590ab187c854f7ac4fde94365209985
+    maintainers:
+    - name: enthus GmbH
+    name: api-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.8.1/api-deployment-0.8.1.tgz
+    version: 0.8.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-10-21T17:39:01.548286972Z"
     description: Deployment chart for the NegSoft API service
     digest: 2da0b1020b22a2e2e397e822f9f469327d113e8fa339db43f8ce03417a23d9d3
@@ -88,6 +100,18 @@ entries:
   api-job-cronjob:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-22T04:53:00.93059654Z"
+    description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
+    digest: 40432f0aa69eca28065297544494aeb7f4f742490ec4e760f09262eeadc3b866
+    maintainers:
+    - name: enthus GmbH
+    name: api-job-cronjob
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.7.1/api-job-cronjob-0.7.1.tgz
+    version: 0.7.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-10-21T17:39:01.748034827Z"
     description: Reusable CronJob chart for the NegSoft job service (scheduled tasks)
     digest: 7059741effe8579f1284993affd075a9b980d2fe85067316fd3002ffc7f07d1e
@@ -123,6 +147,19 @@ entries:
     - https://github.com/enthus-appdev/helm-charts/releases/download/api-job-cronjob-0.5.0/api-job-cronjob-0.5.0.tgz
     version: 0.5.0
   api-manager-deployment:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-10-22T04:53:01.073805752Z"
+    description: Deployment chart for the NegSoft manager (cross-service orchestration)
+      service
+    digest: b8389136690b2b92b11b214345015ec908760ad2321086646de5ffd296eae914
+    maintainers:
+    - name: enthus GmbH
+    name: api-manager-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-manager-deployment-0.7.1/api-manager-deployment-0.7.1.tgz
+    version: 0.7.1
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2026-10-21T17:39:02.016805282Z"
@@ -377,6 +414,16 @@ entries:
   negsoft-operator:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-22T04:53:01.218808764Z"
+    description: Kubernetes operator for managing NegSoft user subscriptions
+    digest: 87eb91de5d0e9bb9f1d99598d23a442fd8ef67a99e08239c8c27e3d8694f112d
+    name: negsoft-operator
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/negsoft-operator-0.6.1/negsoft-operator-0.6.1.tgz
+    version: 0.6.1
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-10-21T17:39:02.609360911Z"
     description: Kubernetes operator for managing NegSoft user subscriptions
     digest: d253cd2deca305024feec70e12e2cdd76a387f2217f49174338df0dd6fc33e5b
@@ -536,4 +583,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-10-21T17:39:02.609425917Z"
+generated: "2026-10-22T04:53:01.218933037Z"
