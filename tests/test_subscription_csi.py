@@ -18,9 +18,10 @@ def render(values):
     with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml") as file:
         yaml.safe_dump(values, file)
         file.flush()
-        output = subprocess.check_output(["helm", "template", "test-subscription", str(ROOT / "charts/api-subscription"),
-                                          "--namespace", "runtime-ns", "-f", file.name],
-                                         text=True, stderr=subprocess.STDOUT)
+        result = subprocess.run(["helm", "template", "test-subscription", str(ROOT / "charts/api-subscription"),
+                                 "--namespace", "runtime-ns", "-f", file.name],
+                                text=True, capture_output=True, check=True, timeout=60)
+        output = result.stdout
     return [obj for obj in yaml.safe_load_all(output) if obj]
 
 
@@ -73,21 +74,23 @@ class SubscriptionCSI(unittest.TestCase):
 
     def test_missing_mount_fields_fail_before_invalid_cr_output(self):
         for entry, field in [({"secretProviderClass": "spc"}, "name"),
-                             ({"name": "volume", "secretProviderClass": "spc"}, "mountPath")]:
+                             ({"name": "volume", "secretProviderClass": "spc"}, "mountPath"),
+                             ({"name": "volume", "mountPath": "/runtime"}, "secretProviderClass")]:
+            entry["create"] = False
             with self.subTest(field=field):
                 with self.assertRaises(subprocess.CalledProcessError) as error:
                     render({"csiSecrets": [entry]})
-                self.assertIn(f"csiSecrets.{field} is required", error.exception.output)
+                self.assertIn(f"csiSecrets.{field} is required", error.exception.stderr)
 
     def test_credential_retention_flag_requires_boolean(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render({"credentialsKeep": "false", "credentials": {"synthetic": "fixture-only"}})
-        self.assertIn("credentialsKeep must be a boolean", error.exception.output)
+        self.assertIn("credentialsKeep must be a boolean", error.exception.stderr)
 
     def test_create_string_false_rejected(self):
         with self.assertRaises(subprocess.CalledProcessError) as error:
             render({"csiSecrets": [dict(MOUNT, create="false")]})
-        self.assertIn("csiSecrets.create must be a boolean", error.exception.output)
+        self.assertIn("csiSecrets.create must be a boolean", error.exception.stderr)
 
     def test_legacy_secret_retention_requires_staging_before_omission(self):
         credentials = {"synthetic-file": "fixture-only"}
@@ -100,6 +103,55 @@ class SubscriptionCSI(unittest.TestCase):
         self.assertEqual(default, retained)
         omitted = render({"credentialsKeep": True, "csiSecrets": [dict(MOUNT, create=False)]})
         self.assertFalse(any(obj["kind"] == "Secret" for obj in omitted))
+
+    def test_missing_new_retention_flag_preserves_default(self):
+        objects = render({"credentialsKeep": None, "credentials": {"synthetic": "fixture-only"}})
+        secret = next(obj for obj in objects if obj["kind"] == "Secret")
+        self.assertNotIn("helm.sh/resource-policy", secret["metadata"].get("annotations", {}))
+
+    def test_owned_spc_requires_nonempty_complete_sources(self):
+        for sources in [None, [], "not-a-list"]:
+            with self.subTest(sources=sources):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render({"csiSecrets": [dict(MOUNT, secrets=sources)]})
+                self.assertIn("csiSecrets.secrets must be a non-empty list", error.exception.stderr)
+        for source in [{"path": "password"}, {"resourceName": "projects/test/secrets/sql/versions/latest"},
+                       {"resourceName": "", "path": "password"}, "not-an-object"]:
+            with self.subTest(source=source):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render({"csiSecrets": [dict(MOUNT, secrets=[source])]})
+                self.assertIn("resourceName and path strings", error.exception.stderr)
+
+    def test_owned_spc_names_are_unique_but_external_sharing_allowed(self):
+        owned = dict(MOUNT, secrets=[{"resourceName": "projects/test/secrets/sql/versions/latest", "path": "password"}])
+        second = dict(owned, name="second-volume")
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render({"csiSecrets": [owned, second]})
+        self.assertIn("chart-owned secretProviderClass must be unique", error.exception.stderr)
+        second["create"] = False
+        objects = render({"csiSecrets": [owned, second]})
+        self.assertEqual(len([obj for obj in objects if obj["kind"] == "SecretProviderClass"]), 1)
+
+    def test_owned_provider_driver_pairing_is_gke_only(self):
+        owned = dict(MOUNT, driver="secrets-store-gke.csi.k8s.io", provider="gke",
+                     secrets=[{"resourceName": "projects/test/secrets/sql/versions/latest", "path": "password"}])
+        objects = render({"csiSecrets": [owned]})
+        subscription = next(obj for obj in objects if obj["kind"] == "NegSoftSubscription")
+        self.assertEqual(subscription["spec"]["csiSecrets"][0]["driver"], owned["driver"])
+        self.assertEqual(next(obj for obj in objects if obj["kind"] == "SecretProviderClass")["spec"]["provider"], "gke")
+        for field, value, message in [("driver", "secrets-store.csi.k8s.io", "requires the GKE driver"),
+                                      ("provider", "gke\nsecretObjects:", "requires provider:gke")]:
+            with self.subTest(field=field):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render({"csiSecrets": [dict(owned, **{field: value})]})
+                self.assertIn(message, error.exception.stderr)
+
+    def test_external_driver_must_match_crd_enum(self):
+        for driver in ["typo-driver", False, ""]:
+            with self.subTest(driver=driver):
+                with self.assertRaises(subprocess.CalledProcessError) as error:
+                    render({"csiSecrets": [dict(MOUNT, create=False, driver=driver)]})
+                self.assertIn("csiSecrets.driver must be a supported CSI driver", error.exception.stderr)
 
     def test_generated_source_provenance_and_chart_retention(self):
         content = CRD.read_bytes()

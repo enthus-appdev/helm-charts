@@ -87,7 +87,9 @@ secrets: []
   #   optional: false
 
 # Per-subscription read-only files. This chart normally owns the namespace SPC;
-# use create:false only to reference an SPC with one other existing Helm owner.
+# Each created SPC name must be unique; shared mounts reference it with create:false.
+# This chart creates GKE-format SPCs only. The community driver is allowed only
+# with create:false referencing a separately configured compatible provider.
 # No Kubernetes Secret sync. Requires the updated CRD and CSI-capable operator;
 # administrator installs schema before application values introduce this field.
 # Generated workers must use the operator template\'s explicit non-default KSA.
