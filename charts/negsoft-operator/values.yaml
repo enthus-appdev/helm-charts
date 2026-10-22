@@ -23,10 +23,16 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
+  # Must be a string; quote numeric names in YAML or use --set-string.
   name: ""
 
 rbac:
+  # Disable only after administrator bootstrap has retained and taken responsibility
+  # for these resources; removing unretained objects from a release can delete them.
   create: true
+  # Stage with create=true in an administrator upgrade before setting create=false.
+  # Verify keep in the stored release manifest, not just on the live objects.
+  keep: false
 
 podAnnotations: {}
 podLabels: {}
