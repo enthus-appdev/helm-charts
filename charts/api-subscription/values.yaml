@@ -11,7 +11,9 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# Runner identity referenced by the operator-generated job template.
+# Optional KSA declaration/creation only: this does NOT select generated worker
+# identity. The operator's global jobServiceAccountName template selects it.
+# If declared here, keep this name consistent with that explicit non-default KSA.
 serviceAccount:
   create: false
   name: ""
@@ -41,6 +43,15 @@ config: {}
 
 # Credential files rendered into the Secret <fullname>-credentials instead of the ConfigMap.
 # Mount it through `secrets` and point the matching <KEY>_FILE env var at each file.
+# Conventional administrator staging keeps old credentials STILL rendered and
+# creates another Helm release record containing existing credential material:
+# EXPLICIT OWNER APPROVAL IS REQUIRED. Verify keep in the PREVIOUS stored release
+# manifest before a later omission upgrade.
+# Live-only annotations or setting true alongside credentials:{} do not stage it.
+# Strict no-new-payload alternative requires a separately approved CSI-first
+# transition/drain, then intentional admin prune after ALL old consumers/templates
+# are gone. Neither path is authorized here; no worker payload read/render/apply.
+credentialsKeep: false
 credentials: {}
   # session-jwtsecret: "ref+gcpsecrets://project/secret-name"
 
@@ -74,6 +85,22 @@ secrets: []
   #   mountPath: /etc/certs
   #   readOnly: true
   #   optional: false
+
+# Per-subscription read-only files. This chart normally owns the namespace SPC;
+# Each created SPC name must be unique; shared mounts reference it with create:false.
+# This chart creates GKE-format SPCs only. The community driver is allowed only
+# with create:false referencing a separately configured compatible provider.
+# No Kubernetes Secret sync. Requires the updated CRD and CSI-capable operator;
+# administrator installs schema before application values introduce this field.
+# Generated workers must use the operator template\'s explicit non-default KSA.
+csiSecrets: []
+  # - name: job-credentials
+  #   mountPath: /var/run/job-secrets
+  #   secretProviderClass: subscription-runtime
+  #   provider: gke
+  #   secrets:
+  #     - resourceName: projects/project/secrets/name/versions/latest
+  #       path: mssql-password
 
 configMaps: []
   # - name: app-config

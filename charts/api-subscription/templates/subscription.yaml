@@ -39,6 +39,20 @@ spec:
   secrets:
     {{ toYaml . | nindent 4}}
   {{- end }}
+  {{- with .Values.csiSecrets }}
+  csiSecrets:
+    {{- range . }}
+    {{- if and (hasKey . "driver") (or (not (kindIs "string" .driver)) (not (has .driver (list "secrets-store-gke.csi.k8s.io" "secrets-store.csi.k8s.io")))) }}
+    {{- fail "csiSecrets.driver must be a supported CSI driver" }}
+    {{- end }}
+    - name: {{ required "csiSecrets.name is required" .name | quote }}
+      mountPath: {{ required "csiSecrets.mountPath is required" .mountPath | quote }}
+      secretProviderClass: {{ required "csiSecrets.secretProviderClass is required" .secretProviderClass | quote }}
+      {{- with .driver }}
+      driver: {{ . | quote }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   {{- with .Values.configMaps }}
   configMaps:
     {{ toYaml . | nindent 4}}
