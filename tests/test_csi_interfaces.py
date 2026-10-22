@@ -100,6 +100,17 @@ class CSIInterfaces(unittest.TestCase):
             render("negsoft-operator", {"secret": {"create": "false"}})
         self.assertIn("secret.create must be a boolean", error.exception.output)
 
+    def test_operator_legacy_secret_keep_is_annotation_only(self):
+        default = next(obj for obj in render("negsoft-operator", {}) if obj["kind"] == "Secret")
+        retained = next(obj for obj in render("negsoft-operator", {"secret": {"keep": True}})
+                        if obj["kind"] == "Secret")
+        self.assertNotIn("helm.sh/resource-policy", default["metadata"].get("annotations", {}))
+        self.assertEqual(retained["metadata"]["annotations"]["helm.sh/resource-policy"], "keep")
+        del retained["metadata"]["annotations"]
+        self.assertEqual(default, retained)
+        omitted = render("negsoft-operator", {"secret": {"create": False, "keep": True}})
+        self.assertFalse(any(obj["kind"] == "Secret" for obj in omitted))
+
     def test_operator_legacy_defaults_remain(self):
         objects = render("negsoft-operator", {})
         self.assertEqual(len([obj for obj in objects if obj["kind"] == "Secret"]), 1)

@@ -105,6 +105,12 @@ affinity: {}
 secret:
   # Boolean only; do not use --set-string for create.
   create: true
+  # Administrator-only conventional retention staging while create=true and old
+  # values remain rendered. Verify keep in the PREVIOUS stored release manifest
+  # before a later create=false upgrade. Live-only keep or one-step omission is
+  # insufficient. No lookup/copy of legacy data; admin must approve this sequence
+  # or a separately verified retirement plan after all old consumers are gone.
+  keep: false
   mssqlHostname: ""
   mssqlPort: "1433"
   mssqlDatabase: ""
