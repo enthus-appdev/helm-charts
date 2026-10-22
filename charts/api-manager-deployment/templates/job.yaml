@@ -24,7 +24,7 @@ spec:
       labels:
         {{- include "api-manager-deployment.selectorLabels" . | nindent 8 }}
     spec:
-      {{- if .Values.signatureVolume.enabled }}
+      {{- if or .Values.signatureVolume.enabled .Values.csiSecrets }}
       serviceAccountName: {{ required "job.serviceAccountName is required for mounted jobs" .Values.job.serviceAccountName | quote }}
       {{- else if .Values.job.serviceAccountName }}
       serviceAccountName: {{ .Values.job.serviceAccountName | quote }}

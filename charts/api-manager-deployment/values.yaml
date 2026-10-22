@@ -147,6 +147,8 @@ configMaps: []
 # A container reads it from the mount path, e.g. via an *_FILE env var. Per-service specifics
 # (the SQL password secret + DATABASE_MSSQL_PASSWORD_FILE env) live in the deployment values.
 # Default off (empty).
+# Set create: false per entry to reference an administrator-provisioned SPC.
+# Removing a previously chart-managed SPC needs an administrator hand-over first.
 csiSecrets: []
   # - name: my-secret
   #   mountPath: /var/run/secret/my-secret

@@ -158,6 +158,8 @@ configMaps: []
 # CSI-mounted secrets (Secrets Store CSI driver + Workload Identity): the pod's identity
 # fetches the secret from the cloud secret manager and mounts it as a file (never in etcd).
 # A container reads it from the mount path, e.g. via an *_FILE env var. Default off (empty).
+# Set create: false per entry to reference an administrator-provisioned SPC.
+# Removing a previously chart-managed SPC needs an administrator hand-over first.
 csiSecrets: []
   # - name: my-secret
   #   mountPath: /var/run/secret/my-secret
