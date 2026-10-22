@@ -42,6 +42,12 @@ class CSIInterfaces(unittest.TestCase):
                           "env": [{"name": "MSSQL_CONFIG_FILE", "value": "/var/run/runtime-secrets/mssql.json"}]}
                 objects = render(chart, values)
                 self.assertFalse(any(obj["kind"] == "SecretProviderClass" for obj in objects))
+                if chart == "api-manager-deployment":
+                    controller = next(obj for obj in objects if obj["kind"] == "Deployment")
+                    self.assertEqual(controller["spec"]["template"]["spec"]["serviceAccountName"], "controller-runtime")
+                    config = next(obj for obj in objects if obj["kind"] == "ConfigMap")
+                    job = yaml.safe_load(config["data"]["template_job.yaml"])
+                    self.assertEqual(job["spec"]["template"]["spec"]["serviceAccountName"], "job-runtime")
                 specs = list(podspecs(objects))
                 self.assertEqual(len(specs), 2 if chart == "api-manager-deployment" else 1)
                 for spec in specs:
@@ -110,6 +116,17 @@ class CSIInterfaces(unittest.TestCase):
         self.assertEqual(default, retained)
         omitted = render("negsoft-operator", {"secret": {"create": False, "keep": True}})
         self.assertFalse(any(obj["kind"] == "Secret" for obj in omitted))
+
+    def test_operator_csi_requires_provider_reference(self):
+        with self.assertRaises(subprocess.CalledProcessError) as error:
+            render("negsoft-operator", {"csiSecrets": [{"name": "files", "mountPath": "/runtime"}]})
+        self.assertIn("csiSecrets.secretProviderClass is required", error.exception.output)
+
+    def test_operator_prefix_is_string(self):
+        objects = render("negsoft-operator", {"cronjobPrefix": "123", "secret": {"create": False}})
+        controller = next(obj for obj in objects if obj["kind"] == "Deployment")
+        env = controller["spec"]["template"]["spec"]["containers"][0]["env"]
+        self.assertEqual(next(item for item in env if item["name"] == "CRONJOB_PREFIX")["value"], "123")
 
     def test_operator_legacy_defaults_remain(self):
         objects = render("negsoft-operator", {})
