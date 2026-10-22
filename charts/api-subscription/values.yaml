@@ -43,10 +43,14 @@ config: {}
 
 # Credential files rendered into the Secret <fullname>-credentials instead of the ConfigMap.
 # Mount it through `secrets` and point the matching <KEY>_FILE env var at each file.
-# Administrator stages true while old credentials are STILL rendered, then
-# verifies keep in the stored release manifest before a later omission upgrade.
+# Conventional administrator staging keeps old credentials STILL rendered and
+# creates another Helm release record containing existing credential material:
+# EXPLICIT OWNER APPROVAL IS REQUIRED. Verify keep in the PREVIOUS stored release
+# manifest before a later omission upgrade.
 # Live-only annotations or setting true alongside credentials:{} do not stage it.
-# Administrator retires the orphan only after no worker/template references it.
+# Strict no-new-payload alternative requires a separately approved CSI-first
+# transition/drain, then intentional admin prune after ALL old consumers/templates
+# are gone. Neither path is authorized here; no worker payload read/render/apply.
 credentialsKeep: false
 credentials: {}
   # session-jwtsecret: "ref+gcpsecrets://project/secret-name"
