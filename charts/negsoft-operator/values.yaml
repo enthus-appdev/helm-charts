@@ -106,10 +106,14 @@ secret:
   # Boolean only; do not use --set-string for create.
   create: true
   # Administrator-only conventional retention staging while create=true and old
-  # values remain rendered. Verify keep in the PREVIOUS stored release manifest
+  # values remain rendered. This creates another Helm release record containing
+  # existing credential material and REQUIRES EXPLICIT OWNER APPROVAL.
+  # Verify keep in the PREVIOUS stored release manifest
   # before a later create=false upgrade. Live-only keep or one-step omission is
   # insufficient. No lookup/copy of legacy data; admin must approve this sequence
-  # or a separately verified retirement plan after all old consumers are gone.
+  # or a separately approved CSI-first transition/drain, followed by intentional
+  # administrator prune only after ALL old consumers/templates are gone. Neither
+  # path is authorized by this flag; no worker payload reads/renders/applies.
   keep: false
   mssqlHostname: ""
   mssqlPort: "1433"
