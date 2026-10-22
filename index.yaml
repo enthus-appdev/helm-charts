@@ -3,6 +3,18 @@ entries:
   api-deployment:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-10-22T17:20:33.674961695Z"
+    description: Deployment chart for the NegSoft API service
+    digest: 35f7a21d4ea219a57838b05a7a0a2ca1ceab73eb49cfc7c8ea09cbf0e5ffa0d1
+    maintainers:
+    - name: enthus GmbH
+    name: api-deployment
+    type: application
+    urls:
+    - https://github.com/enthus-appdev/helm-charts/releases/download/api-deployment-0.10.0/api-deployment-0.10.0.tgz
+    version: 0.10.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-10-22T09:35:15.786174289Z"
     description: Deployment chart for the NegSoft API service
     digest: 1402d27a800c0c26675f0ad1f5bcd13a1006b25ccaf0439fc3f3501a3bc06fab
@@ -595,4 +607,4 @@ entries:
     urls:
     - https://github.com/enthus-appdev/helm-charts/releases/download/pim-cronjob-0.2.1/pim-cronjob-0.2.1.tgz
     version: 0.2.1
-generated: "2026-10-22T09:35:15.786251893Z"
+generated: "2026-10-22T17:20:33.675061631Z"
