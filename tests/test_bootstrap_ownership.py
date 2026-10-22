@@ -86,6 +86,15 @@ class BootstrapOwnership(unittest.TestCase):
                     self.assertEqual(len(bindings), 1 if chart == "api-manager-deployment" else 2)
                     for binding in bindings:
                         self.assertEqual(binding["subjects"][0]["name"], name)
+                    account = next(obj for obj in objects if obj["kind"] == "ServiceAccount")
+                    deployment = next(obj for obj in objects if obj["kind"] == "Deployment")
+                    self.assertEqual(account["metadata"]["name"], name)
+                    self.assertEqual(deployment["spec"]["template"]["spec"]["serviceAccountName"], name)
+                    external = render(chart, "serviceAccount.create=false",
+                                      string_settings=[f"serviceAccount.name={name}"])
+                    self.assertFalse(any(obj["kind"] == "ServiceAccount" for obj in external))
+                    workload = next(obj for obj in external if obj["kind"] == "Deployment")
+                    self.assertEqual(workload["spec"]["template"]["spec"]["serviceAccountName"], name)
 
     def test_binding_uses_runtime_service_account(self):
         for chart in ["api-manager-deployment", "negsoft-operator"]:
