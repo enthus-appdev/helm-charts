@@ -60,6 +60,30 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          {{- if .Values.grpcProbes.enabled }}
+          {{- include "api-deployment.grpcProbes.validate" . }}
+            - name: grpc-health
+              containerPort: {{ int .Values.grpcProbes.port }}
+              protocol: TCP
+          livenessProbe:
+            grpc:
+              port: {{ int .Values.grpcProbes.port }}
+              {{- with .Values.grpcProbes.service }}
+              service: {{ . | quote }}
+              {{- end }}
+            {{- with .Values.grpcProbes.liveness }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            grpc:
+              port: {{ int .Values.grpcProbes.port }}
+              {{- with .Values.grpcProbes.service }}
+              service: {{ . | quote }}
+              {{- end }}
+            {{- with .Values.grpcProbes.readiness }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- end }}
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
