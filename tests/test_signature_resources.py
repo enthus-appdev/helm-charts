@@ -6,7 +6,8 @@ import yaml
 from test_csi_interfaces import CSI, render
 
 CHARTS = ["api-deployment", "api-job-cronjob", "api-manager-deployment", "negsoft-operator"]
-REQUESTS = {"gke-gcsfuse/cpu-request": "10m", "gke-gcsfuse/memory-request": "128Mi"}
+RESOURCES = {"gke-gcsfuse/cpu-request": "10m", "gke-gcsfuse/memory-request": "128Mi",
+             "gke-gcsfuse/cpu-limit": "0", "gke-gcsfuse/memory-limit": "0"}
 
 
 def templates(objects):
@@ -29,7 +30,7 @@ def values(enabled):
 
 
 class SignatureResources(unittest.TestCase):
-    def test_enabled_requests_without_limits(self):
+    def test_enabled_requests_with_unlimited_limits(self):
         for chart in CHARTS:
             with self.subTest(chart=chart):
                 pods = list(templates(render(chart, values(True))))
@@ -39,7 +40,7 @@ class SignatureResources(unittest.TestCase):
                 for pod in mounted:
                     annotations = pod["metadata"]["annotations"]
                     fuse = {key: value for key, value in annotations.items() if key.startswith("gke-gcsfuse/")}
-                    self.assertEqual(fuse, {"gke-gcsfuse/volumes": "true", **REQUESTS})
+                    self.assertEqual(fuse, {"gke-gcsfuse/volumes": "true", **RESOURCES})
                     volume = next(item for item in pod["spec"]["volumes"] if item["name"] == "signatures")
                     self.assertTrue(volume["csi"]["readOnly"])
                     self.assertEqual(volume["csi"]["volumeAttributes"]["bucketName"], "test-signatures")
@@ -62,12 +63,27 @@ class SignatureResources(unittest.TestCase):
                 config = values(True)
                 config["signatureVolume"]["sidecarAnnotations"] = overrides
                 config["podAnnotations"] = {"test.example/annotation": "preserved"}
+                mounted = [pod for pod in templates(render(chart, config))
+                           if "gke-gcsfuse/volumes" in pod["metadata"].get("annotations", {})]
+                self.assertEqual(len(mounted), 2 if chart == "api-manager-deployment" else 1)
+                for pod in mounted:
+                    annotations = pod["metadata"]["annotations"]
+                    for key, value in overrides.items():
+                        self.assertEqual(annotations[key], value)
+                    self.assertEqual(annotations["test.example/annotation"], "preserved")
+
+    def test_partial_override_keeps_other_defaults(self):
+        for chart in CHARTS:
+            with self.subTest(chart=chart):
+                config = values(True)
+                config["signatureVolume"]["sidecarAnnotations"] = {"gke-gcsfuse/cpu-request": "20m"}
                 for pod in templates(render(chart, config)):
                     annotations = pod["metadata"].get("annotations", {})
                     if "gke-gcsfuse/volumes" in annotations:
-                        for key, value in overrides.items():
+                        for key, value in dict(RESOURCES, **{"gke-gcsfuse/cpu-request": "20m"}).items():
                             self.assertEqual(annotations[key], value)
-                        self.assertEqual(annotations["test.example/annotation"], "preserved")
+                    else:
+                        self.assertFalse(any(key.startswith("gke-gcsfuse/") for key in annotations))
 
 
 if __name__ == "__main__":
