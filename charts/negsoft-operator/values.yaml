@@ -136,6 +136,12 @@ signatureVolume:
   bucketName: ""
   mountPath: /mnt/signatures
   mountOptions: implicit-dirs
+  # Small reservations; explicit zero limits keep runtime usage uncapped.
+  sidecarAnnotations:
+    gke-gcsfuse/cpu-request: 10m
+    gke-gcsfuse/memory-request: 128Mi
+    gke-gcsfuse/cpu-limit: "0"
+    gke-gcsfuse/memory-limit: "0"
 
 # Identity of generated subscription jobs, not the operator controller.
 jobServiceAccountName: ""
