@@ -136,6 +136,10 @@ signatureVolume:
   bucketName: ""
   mountPath: /mnt/signatures
   mountOptions: implicit-dirs
+  # Reservations for the small read-only mount; runtime limits stay unchanged.
+  sidecarAnnotations:
+    gke-gcsfuse/cpu-request: 10m
+    gke-gcsfuse/memory-request: 128Mi
 
 # Identity of generated subscription jobs, not the operator controller.
 jobServiceAccountName: ""
